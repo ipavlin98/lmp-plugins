@@ -3812,22 +3812,22 @@
 			}
 		});
 
-		Lampa.SettingsApi.addParam({
-			component: "lamponline_settings",
-			param: {
-				name: "lamponline_load_public_servers_btn",
-				type: "static"
-			},
-			field: {
-				name: Lampa.Lang.translate("lampac_load_public_servers"),
-				description: Lampa.Lang.translate("lampac_load_public_servers_desc")
-			},
-			onRender: function (item) {
-				item.on("hover:enter", function () {
-					loadPublicServers();
-				});
-			}
-		});
+		// Lampa.SettingsApi.addParam({
+		// 	component: "lamponline_settings",
+		// 	param: {
+		// 		name: "lamponline_load_public_servers_btn",
+		// 		type: "static"
+		// 	},
+		// 	field: {
+		// 		name: Lampa.Lang.translate("lampac_load_public_servers"),
+		// 		description: Lampa.Lang.translate("lampac_load_public_servers_desc")
+		// 	},
+		// 	onRender: function (item) {
+		// 		item.on("hover:enter", function () {
+		// 			loadPublicServers();
+		// 		});
+		// 	}
+		// });
 
 		Lampa.SettingsApi.addParam({
 			component: "lamponline_settings",

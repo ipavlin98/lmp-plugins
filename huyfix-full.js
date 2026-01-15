@@ -4570,19 +4570,19 @@
 			}
 		});
 
-		Lampa.SettingsApi.addParam({
-			component: "online_settings",
-			param: { name: "online_load_public_btn", type: "static" },
-			field: {
-				name: "Загрузить публичные серверы",
-				description: "Загрузить список бесплатных серверов"
-			},
-			onRender: function (item) {
-				item.on("hover:enter", function () {
-					loadPublicServers();
-				});
-			}
-		});
+		// Lampa.SettingsApi.addParam({
+		// 	component: "online_settings",
+		// 	param: { name: "online_load_public_btn", type: "static" },
+		// 	field: {
+		// 		name: "Загрузить публичные серверы",
+		// 		description: "Загрузить список бесплатных серверов"
+		// 	},
+		// 	onRender: function (item) {
+		// 		item.on("hover:enter", function () {
+		// 			loadPublicServers();
+		// 		});
+		// 	}
+		// });
 
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",

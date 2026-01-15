@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+		/>
+		<title>Lampa Plugins</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			:root {
+				--background: #000000;
+				--foreground: #fafafa;
+				--muted-foreground: #71717a;
+				--success: #22c55e;
+				--success-muted: rgba(34, 197, 94, 0.12);
+				--border: #1a1a1a;
+				--input: #0a0a0a;
+				--radius: 0.5rem;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html {
+				scroll-behavior: smooth;
+				overflow-y: scroll;
+			}
+
+			::-webkit-scrollbar {
+				width: 4px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border-radius: 2px;
+			}
+
+			body {
+				background-color: var(--background);
+				color: var(--foreground);
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				font-size: 0.875rem;
+				line-height: 1.5;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			.container {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 3rem 1.5rem;
+			}
+
+			.header {
+				margin-bottom: 2rem;
+			}
+
+			.header h1 {
+				font-size: 1.5rem;
+				font-weight: 500;
+				letter-spacing: -0.02em;
+				margin: 0 0 0.5rem 0;
+				color: var(--foreground);
+			}
+
+			.header p {
+				color: var(--muted-foreground);
+				font-size: 0.875rem;
+				margin: 0;
+			}
+
+			.filters {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.filter-btn {
+				padding: 0.45rem 0.6rem;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: 3px;
+				color: var(--muted-foreground);
+				font-size: 0.625rem;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.filter-btn[data-filter="all"] {
+				background: var(--background);
+				border-color: rgba(255, 255, 255, 0.12);
+			}
+
+			.filter-btn[data-filter="online"] {
+				background: rgba(34, 197, 94, 0.12);
+				color: #22c55e;
+			}
+
+			.filter-btn[data-filter="ui"] {
+				background: rgba(99, 102, 241, 0.12);
+				color: #818cf8;
+			}
+
+			.filter-btn[data-filter="player"] {
+				background: rgba(249, 115, 22, 0.12);
+				color: #fb923c;
+			}
+
+			.filter-btn[data-filter="anime"] {
+				background: rgba(236, 72, 153, 0.12);
+				color: #f472b6;
+			}
+
+			.filter-btn.active[data-filter="all"] {
+				border-color: rgba(255, 255, 255, 0.3);
+			}
+
+			.filter-btn.active[data-filter="online"] {
+				border-color: rgba(34, 197, 94, 0.70);
+			}
+
+			.filter-btn.active[data-filter="ui"] {
+				border-color: rgba(129, 141, 248, 0.70);
+			}
+
+			.filter-btn.active[data-filter="player"] {
+				border-color: rgba(251, 146, 60, 0.70);
+			}
+
+			.filter-btn.active[data-filter="anime"] {
+				border-color: rgba(244, 114, 181, 0.70);
+			}
+
+			a {
+				color: var(--foreground);
+				text-decoration: none;
+				border-bottom: 1px solid var(--border);
+				transition: border-color 0.2s ease;
+			}
+
+			a:hover {
+				border-color: var(--foreground);
+			}
+
+			.plugins-list {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+				background: var(--border);
+				border-radius: var(--radius);
+				overflow: hidden;
+			}
+
+			.plugin-item {
+				background: var(--background);
+				padding: 1.25rem 0;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 1rem;
+				transition: background 0.2s ease;
+			}
+
+			.plugin-item.hidden {
+				display: none;
+			}
+
+			.plugin-item:hover {
+				background: #050505;
+			}
+
+			.plugin-info {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.plugin-top {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				margin-bottom: 0.25rem;
+			}
+
+			.plugin-name {
+				font-size: 0.9375rem;
+				font-weight: 500;
+				color: var(--foreground);
+				margin: 0;
+			}
+
+			.plugin-badge {
+				font-size: 0.625rem;
+				font-weight: 500;
+				padding: 0.2rem 0.4rem;
+				border-radius: 3px;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			.plugin-badge[data-type="online"] {
+				background: rgba(34, 197, 94, 0.12);
+				color: #22c55e;
+			}
+
+			.plugin-badge[data-type="ui"] {
+				background: rgba(99, 102, 241, 0.12);
+				color: #818cf8;
+			}
+
+			.plugin-badge[data-type="player"] {
+				background: rgba(249, 115, 22, 0.12);
+				color: #fb923c;
+			}
+
+			.plugin-badge[data-type="anime"] {
+				background: rgba(236, 72, 153, 0.12);
+				color: #f472b6;
+			}
+
+			.plugin-description {
+				color: var(--muted-foreground);
+				font-size: 0.8125rem;
+				margin: 0;
+				/* white-space: nowrap; */
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.plugin-actions {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				flex-shrink: 0;
+				width: 100%;
+			}
+
+			.plugin-url {
+				background: var(--input);
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				padding: 0.4rem 0.75rem;
+				height: 2rem;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.6875rem;
+				color: var(--muted-foreground);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				user-select: all;
+				cursor: text;
+			}
+
+			.copy-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 2rem;
+				height: 2rem;
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.copy-btn:hover {
+				border-color: var(--muted-foreground);
+			}
+
+			.copy-btn svg {
+				width: 14px;
+				height: 14px;
+				color: var(--muted-foreground);
+				transition: color 0.2s ease;
+			}
+
+			.copy-btn:hover svg {
+				color: var(--foreground);
+			}
+
+			.copy-btn.copied {
+				border-color: var(--success);
+			}
+
+			.copy-btn.copied svg {
+				color: var(--success);
+			}
+
+			@media (max-width: 800px) {
+				.container {
+					padding: 2rem 1.5rem;
+				}
+
+				.plugin-item {
+					padding: 1rem 0;
+				}
+
+				.plugin-description {
+					white-space: normal;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<header class="header">
+				<h1>Коллекция плагинов</h1>
+				<p>Telegram автора: <a href="https://t.me/ipavlin98">@ipavlin98</a></p>
+			</header>
+
+			<div class="filters" id="filters">
+				<button class="filter-btn active" data-filter="all">Все</button>
+				<button class="filter-btn" data-filter="online">Онлайн</button>
+				<button class="filter-btn" data-filter="ui">UI</button>
+				<button class="filter-btn" data-filter="player">Плеер</button>
+				<button class="filter-btn" data-filter="anime">Аниме</button>
+			</div>
+
+			<div class="plugins-list" id="pluginsList"></div>
+		</div>
+
+		<script>
+			const BASE_URL = "https://ipavlin98.github.io/";
+
+			const plugins = [
+				{
+					name: "OnlineServe",
+					file: "lmp-plugins/oooo.js",
+					description: "Берёт онлайн с лампак сервера или с BWA (по коду), ссылки можно указать в настройках.",
+					badge: "Онлайн"
+				},
+				{
+					name: "HFix",
+					file: "lmp-plugins/huyfix.js",
+					description: "То же, что и OnlineServe, но с автоматическим поиском по всем выбранным в настройках балансерам без ручного выбора при запуске.",
+					badge: "Онлайн"
+				},
+				{
+					name: "Season Fix",
+					file: "lmp-plugins/season-fix.js",
+					description: "Разбивает бесконечные первые сезоны аниме на нормальные части используя базу данных TVmaze.",
+					badge: "Аниме"
+				},
+				{
+					name: "Anime Skip",
+					file: "lmp-plugins/anime-skip.js",
+					description: "Пропуск опенингов и эндингов в аниме через базу Aniskip. Просмотреть или изменить информацию для конкретного аниме можно <a href='https://ipavlin98.github.io/lmp-plugins/aniskip.html' target='_blank'>здесь.</a>",
+					badge: "Аниме"
+				},
+				{
+					name: "Interface",
+					file: "lmp-plugins/int.js",
+					description: "Своя версия «стильного интерфейса» с множеством разных настроек.",
+					badge: "UI"
+				},
+				{
+					name: "Cardify Rating",
+					file: "lmp-plugins/cardify.js",
+					description: "Немного исправленная версия Cardify с парой фиксов и отображением рейтингов.",
+					badge: "UI"
+				},
+				{
+					name: "Logo",
+					file: "lmp-plugins/logo.js",
+					description: "Логотипы вместо названий. Плавная загрузка, кеширование, настройки разрешения.",
+					badge: "UI"
+				},
+				{
+					name: "Series Progress",
+					file: "lmp-plugins/series-progress-fix.js",
+					description: "Исправленное и более аккуратное отображение прогресса просмотра сериалов и фильмов на карточках.",
+					badge: "UI"
+				},
+				{
+					name: "Torrent Styles",
+					file: "lmp-plugins/torr-styles.js",
+					description: "Подсветка высоких сидов зелёным, высокого битрейта красным, зелёная рамка фокуса.",
+					badge: "UI"
+				},
+				{
+					name: "Series Skip",
+					file: "lmp-series-skip-db/series-skip.js",
+					description: "Пропуск интро и аутро для сериалов. Работает для большинства популярных тайтлов.",
+					badge: "Плеер"
+				},
+				{
+					name: "PiP",
+					file: "lmp-plugins/pip.js",
+					description: "Картинка в картинке для Tizen и других систем. Дает возможно перемещаться по лампе не выходя из плеера.",
+					badge: "Плеер"
+				},
+				{
+					name: "RuTube Trailers",
+					file: "lmp-plugins/rt.js",
+					description: "Исправляет воспроизведение RuTube трейлеров на многих системах (плагин самодостаточный, если у вас уже стоит плагин для RuTube трейлеров, удалите его перед установкой моего).",
+					badge: "Плеер"
+				}
+			];
+
+			function copyToClipboard(text, btn) {
+				navigator.clipboard.writeText(text).then(() => {
+					btn.classList.add("copied");
+					btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+					setTimeout(() => {
+						btn.classList.remove("copied");
+						btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+					}, 2000);
+				});
+			}
+
+			function createPluginItem(plugin) {
+				const url = BASE_URL + plugin.file;
+
+				const badgeTypes = {
+					"Онлайн": "online",
+					"UI": "ui",
+					"Плеер": "player",
+					"Аниме": "anime"
+				};
+
+				const item = document.createElement("div");
+				item.className = "plugin-item";
+				item.dataset.category = badgeTypes[plugin.badge] || 'ui';
+
+				item.innerHTML = `
+					<div class="plugin-info">
+						<div class="plugin-top">
+							<h3 class="plugin-name">${plugin.name}</h3>
+							<span class="plugin-badge" data-type="${badgeTypes[plugin.badge] || 'ui'}">${plugin.badge}</span>
+						</div>
+						<p class="plugin-description">${plugin.description}</p>
+					</div>
+					<div class="plugin-actions">
+						<div class="plugin-url">${url}</div>
+						<button class="copy-btn" title="Копировать ссылку">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+								<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+							</svg>
+						</button>
+					</div>
+				`;
+
+				const copyBtn = item.querySelector(".copy-btn");
+				copyBtn.addEventListener("click", () => copyToClipboard(url, copyBtn));
+
+				return item;
+			}
+
+			function filterPlugins(category) {
+				const items = document.querySelectorAll(".plugin-item");
+				items.forEach(item => {
+					if (category === "all" || item.dataset.category === category) {
+						item.classList.remove("hidden");
+					} else {
+						item.classList.add("hidden");
+					}
+				});
+			}
+
+			function init() {
+				const list = document.getElementById("pluginsList");
+				plugins.forEach((plugin) => {
+					list.appendChild(createPluginItem(plugin));
+				});
+
+				const filterBtns = document.querySelectorAll(".filter-btn");
+				filterBtns.forEach(btn => {
+					btn.addEventListener("click", () => {
+						filterBtns.forEach(b => b.classList.remove("active"));
+						btn.classList.add("active");
+						filterPlugins(btn.dataset.filter);
+					});
+				});
+			}
+
+			init();
+		</script>
+	</body>
+</html>
