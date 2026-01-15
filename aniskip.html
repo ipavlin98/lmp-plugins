@@ -1,0 +1,4549 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="apple-mobile-web-app-title" content="Aniskip" />
+
+	<title>Aniskip</title>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+		rel="stylesheet" />
+
+	<style>
+		:root {
+			--background: #09090b;
+			--background-secondary: #0c0c0f;
+			--foreground: #fafafa;
+
+			--card: #0f0f12;
+			--card-foreground: #fafafa;
+
+			--popover: #111114;
+			--popover-foreground: #fafafa;
+
+			--primary: #fafafa;
+			--primary-foreground: #18181b;
+			--primary-hover: #e4e4e7;
+
+			--secondary: #1c1c1f;
+			--secondary-foreground: #fafafa;
+
+			--muted: #1f1f23;
+			--muted-foreground: #71717a;
+
+			--accent: #1c1c21;
+			--accent-foreground: #fafafa;
+
+			--destructive: #dc2626;
+			--destructive-foreground: #fafafa;
+
+			--success: #22c55e;
+			--success-strong: #16a34a;
+			--success-muted: rgba(34, 197, 94, 0.12);
+			--destructive-muted: rgba(239, 68, 68, 0.1);
+			--success-accent: #4ade80;
+			--destructive-accent: #f87171;
+
+			--skip-ed-start: #6366f1;
+			--skip-ed-end: #4f46e5;
+			--skip-ed-accent: #818cf8;
+			--skip-recap-end: #d97706;
+			--skip-mixed-op-start: #10b981;
+			--skip-mixed-op-end: #059669;
+			--skip-mixed-ed-start: #8b5cf6;
+			--skip-mixed-ed-end: #7c3aed;
+
+			--white: #ffffff;
+
+			--warning: #f59e0b;
+			--warning-muted: rgba(245, 158, 11, 0.12);
+			--warning-accent: #fbbf24;
+
+			--border: #27272a;
+			--border-subtle: #1f1f23;
+			--input: #1a1a1d;
+			--ring: #52525b;
+			--ring-primary: #a1a1aa;
+
+			--radius: 0.625rem;
+			--sidebar-width: 340px;
+			--sheet-collapsed-height: 40px;
+
+			--scroll-wheel-bg: #141416;
+			--scroll-wheel-border: #27272a;
+
+			--sh-key: #9cdcfe;
+			--sh-string: #ce9178;
+			--sh-number: #b5cea8;
+			--sh-boolean: #569cd6;
+			--sh-null: #569cd6;
+			--code-foreground: #d4d4d8;
+
+			--gradient-primary: linear-gradient(135deg, #fafafa 0%, #d4d4d8 100%);
+			--gradient-subtle: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+			--gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(250, 250, 250, 0.08) 0%, transparent 60%);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		::-webkit-scrollbar {
+			width: 6px;
+			height: 6px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: var(--border);
+			border-radius: 3px;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background: var(--muted-foreground);
+		}
+
+		::-webkit-scrollbar-corner {
+			background: transparent;
+		}
+
+		body {
+			background-color: var(--background);
+			background-image: var(--gradient-glow);
+			color: var(--foreground);
+			font-family:
+				"Inter",
+				-apple-system,
+				BlinkMacSystemFont,
+				sans-serif;
+			margin: 0;
+			padding: 0;
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			overflow: hidden;
+			font-size: 0.875rem;
+			line-height: 1.5;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: var(--sidebar-width) 1fr;
+			width: 100%;
+			max-width: 1600px;
+			height: 100vh;
+		}
+
+		.sidebar {
+			border-right: 1px solid var(--border-subtle);
+			padding: 1.75rem 1.5rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+			overflow-y: auto;
+			background: var(--background);
+			background-image: var(--gradient-subtle);
+			position: relative;
+		}
+
+		.sidebar::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 1px;
+			height: 100%;
+			background: linear-gradient(180deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
+		}
+
+		.main-content {
+			padding: 1.75rem 2rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+			overflow-y: auto;
+			background: var(--background-secondary);
+			position: relative;
+		}
+
+		.sheet-handle {
+			display: none;
+		}
+
+		h2 {
+			font-size: 1.125rem;
+			font-weight: 600;
+			letter-spacing: -0.02em;
+			margin: 0 0 0.125rem 0;
+			color: var(--foreground);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		h2::before {
+			content: "";
+			width: 3px;
+			height: 1em;
+			background: var(--gradient-primary);
+			border-radius: 2px;
+		}
+
+		.section-title {
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.875rem;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		p.hint {
+			font-size: 0.75rem;
+			color: var(--muted-foreground);
+			margin: 0.375rem 0 0 0;
+			line-height: 1.4;
+		}
+
+		.form-section {
+			background: var(--card);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius);
+			padding: 1rem 1.25rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.form-group {
+			margin-bottom: 1rem;
+		}
+
+		.form-group:last-child {
+			margin-bottom: 0;
+		}
+
+		label {
+			display: block;
+			font-size: 0.8125rem;
+			font-weight: 500;
+			margin-bottom: 0.5rem;
+			color: var(--foreground);
+			letter-spacing: -0.01em;
+		}
+
+		input[type="text"],
+		input[type="number"] {
+			height: 2.375rem;
+			width: 100%;
+			border-radius: var(--radius);
+			border: 1px solid var(--border-subtle);
+			background-color: var(--input);
+			padding: 0 0.875rem;
+			font-size: 0.875rem;
+			color: var(--foreground);
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			font-family: inherit;
+		}
+
+		input[type="text"]:hover,
+		input[type="number"]:hover {
+			border-color: var(--border);
+			background-color: var(--secondary);
+		}
+
+		input:focus {
+			outline: none;
+			border-color: var(--ring-primary);
+			background-color: var(--secondary);
+			box-shadow: 0 0 0 3px rgba(161, 161, 170, 0.15);
+		}
+
+		.scroll-wheel {
+			width: 28px;
+			position: relative;
+			background: var(--scroll-wheel-bg);
+			border: 1px solid var(--scroll-wheel-border);
+			border-radius: 6px;
+			overflow: hidden;
+			cursor: grab;
+			touch-action: none;
+			flex-shrink: 0;
+			box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+			user-select: none;
+		}
+
+		.scroll-wheel:active {
+			cursor: grabbing;
+		}
+
+		.scroll-wheel-ridges {
+			position: absolute;
+			top: -20px;
+			bottom: -20px;
+			left: 0;
+			right: 0;
+			background-image: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0px, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px);
+			will-change: transform;
+		}
+
+		.scroll-wheel::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.8) 100%);
+			pointer-events: none;
+		}
+
+		.scroll-wheel::before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 0;
+			right: 0;
+			height: 10px;
+			transform: translateY(-50%);
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+			pointer-events: none;
+			z-index: 1;
+		}
+
+		input::placeholder {
+			color: var(--muted-foreground);
+			opacity: 0.6;
+		}
+
+		.checkbox-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.625rem;
+		}
+
+		.checkbox-full-width {
+			grid-column: 1 / -1;
+		}
+
+		.checkbox-wrapper {
+			display: flex;
+			align-items: center;
+			gap: 0.625rem;
+			cursor: pointer;
+			user-select: none;
+			padding: 0.5rem 0.625rem;
+			border-radius: calc(var(--radius) - 2px);
+			transition: all 0.15s ease;
+			background: transparent;
+			border: 1px solid var(--border-subtle);
+		}
+
+		.checkbox-wrapper:hover {
+			background: var(--accent);
+		}
+
+		.checkbox-wrapper input {
+			display: none;
+		}
+
+		.custom-checkbox {
+			width: 1.125rem;
+			height: 1.125rem;
+			border: 1.5px solid var(--ring);
+			border-radius: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			background: transparent;
+			flex-shrink: 0;
+		}
+
+		.checkbox-wrapper input:checked+.custom-checkbox {
+			background: var(--foreground);
+			border-color: var(--foreground);
+			color: var(--background);
+		}
+
+		.checkbox-wrapper:hover .custom-checkbox {
+			border-color: var(--foreground);
+		}
+
+		.custom-checkbox svg {
+			width: 12px;
+			height: 12px;
+			display: none;
+			stroke-width: 3;
+		}
+
+		.checkbox-wrapper input:checked+.custom-checkbox svg {
+			display: block;
+			animation: checkmark 0.2s ease-out;
+		}
+
+		@keyframes checkmark {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		.checkbox-label {
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--foreground);
+			letter-spacing: -0.01em;
+		}
+
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			white-space: nowrap;
+			border-radius: var(--radius);
+			font-size: 0.8125rem;
+			font-weight: 500;
+			height: 2.375rem;
+			padding: 0 1.125rem;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			cursor: pointer;
+			width: 100%;
+			border: 1px solid transparent;
+			letter-spacing: -0.01em;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.btn::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+			opacity: 0;
+			transition: opacity 0.2s;
+		}
+
+		.btn:hover::before {
+			opacity: 1;
+		}
+
+		.btn-primary {
+			background: var(--foreground);
+			color: var(--background);
+			box-shadow:
+				0 1px 2px rgba(0, 0, 0, 0.2),
+				0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+		}
+
+		.btn-primary:hover {
+			background: var(--primary-hover);
+
+			box-shadow:
+				0 4px 12px rgba(0, 0, 0, 0.3),
+				0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+		}
+
+		.btn-outline {
+			background-color: transparent;
+			border-color: var(--border);
+			color: var(--foreground);
+		}
+
+		.btn-outline:hover {
+			background-color: var(--accent);
+			border-color: var(--ring);
+		}
+
+		.btn-icon {
+			width: 2.375rem;
+			padding: 0;
+			flex-shrink: 0;
+		}
+
+		.btn-icon svg {
+			transition: transform 0.2s ease;
+		}
+
+		.btn-icon:hover svg {
+			transform: scale(1.1);
+		}
+
+		.search-results {
+			position: absolute;
+			z-index: 50;
+			width: 100%;
+
+			background: var(--popover);
+			border: 1px solid var(--border);
+			border-radius: var(--radius);
+			box-shadow:
+				0 10px 40px -10px rgba(0, 0, 0, 0.5),
+				0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+			margin-top: 6px;
+			overflow: hidden;
+			display: none;
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+		}
+
+		.search-results-content {
+			max-height: 280px;
+			overflow-y: auto;
+		}
+
+		.search-results.active {
+			display: block;
+			animation: slideDown 0.2s ease-out;
+		}
+
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		.search-item {
+			background: none;
+			border: none;
+			width: 100%;
+			text-align: left;
+			padding: 0.75rem 1rem;
+			display: flex;
+			gap: 0.875rem;
+			align-items: center;
+			cursor: pointer;
+			transition: all 0.15s ease;
+			border-bottom: 1px solid var(--border-subtle);
+		}
+
+		.search-item:last-child {
+			border-bottom: none;
+		}
+
+		.search-item:hover {
+			background: var(--accent);
+		}
+
+		.search-item img {
+			width: 36px;
+			height: 52px;
+			object-fit: cover;
+			border-radius: 6px;
+			background: var(--muted);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		}
+
+		.search-text b {
+			display: block;
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--foreground);
+			margin-bottom: 0.25rem;
+			line-height: 1.3;
+		}
+
+		.search-text span {
+			font-size: 0.75rem;
+			color: var(--muted-foreground);
+			font-family: "JetBrains Mono", monospace;
+			letter-spacing: -0.02em;
+		}
+
+		.output-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--border-subtle);
+			margin-bottom: 1rem;
+		}
+
+		.season-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(3.25rem, 1fr));
+			gap: 0.5rem;
+			margin-bottom: 1.25rem;
+			padding: 0.3rem;
+		}
+
+		.ep-badge {
+			height: 2.25rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			border-radius: calc(var(--radius) - 2px);
+			border: 1px solid var(--border-subtle);
+			background: var(--card);
+			color: var(--muted-foreground);
+			font-size: 0.8125rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			font-family: "JetBrains Mono", monospace;
+		}
+
+		.ep-badge:hover {
+			border-color: var(--ring);
+			color: var(--foreground);
+			background: var(--accent);
+
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		}
+
+		.ep-badge.found {
+			border-color: rgba(34, 197, 94, 0.3);
+			color: var(--success-accent);
+			background: var(--success-muted);
+		}
+
+		.ep-badge.found:hover {
+			background: rgba(34, 197, 94, 0.2);
+			border-color: rgba(34, 197, 94, 0.5);
+		}
+
+		.ep-badge.missing {
+			border-color: rgba(239, 68, 68, 0.3);
+			color: var(--destructive-accent);
+			background: rgba(239, 68, 68, 0.08);
+		}
+
+		.ep-badge.missing:hover {
+			background: rgba(239, 68, 68, 0.15);
+			border-color: rgba(239, 68, 68, 0.5);
+		}
+
+		.ep-badge.imported {
+			border-color: rgba(99, 102, 241, 0.5);
+			color: var(--skip-ed-accent);
+			background: rgba(99, 102, 241, 0.15);
+		}
+
+		.ep-badge.imported:hover {
+			background: rgba(99, 102, 241, 0.25);
+			border-color: var(--skip-ed-accent);
+		}
+
+		.ep-badge.active {
+			box-shadow:
+				0 0 0 2px var(--background-secondary),
+				0 0 0 4px var(--ring-primary),
+				0 4px 12px rgba(0, 0, 0, 0.2);
+		}
+
+		.code-container {
+			background: var(--background);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius);
+			position: relative;
+			flex: 1;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			box-shadow:
+				0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+				0 2px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.code-actions {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.625rem 1rem;
+			border-bottom: 1px solid var(--border-subtle);
+			background: rgba(255, 255, 255, 0.015);
+		}
+
+		.code-actions span {
+			font-family: "JetBrains Mono", monospace;
+			font-size: 0.75rem;
+			color: var(--muted-foreground);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.code-actions span::before {
+			content: "";
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--success);
+			animation: pulse 2s ease-in-out infinite;
+		}
+
+		@keyframes pulse {
+
+			0%,
+			100% {
+				opacity: 0.4;
+			}
+
+			50% {
+				opacity: 1;
+			}
+		}
+
+		.code-scroll {
+			padding: 0rem 0.5rem 0.5rem 0.5rem;
+			overflow: auto;
+			flex: 1;
+			font-family: "JetBrains Mono", monospace;
+			font-size: 0.8125rem;
+			line-height: 1.6;
+			color: var(--code-foreground);
+		}
+
+		.code-scroll pre {
+			margin: 0;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		.sh-key {
+			color: var(--sh-key);
+		}
+
+		.sh-str {
+			color: var(--sh-string);
+		}
+
+		.sh-num {
+			color: var(--sh-number);
+		}
+
+		.sh-bool {
+			color: var(--sh-boolean);
+		}
+
+		.sh-null {
+			color: var(--sh-null);
+		}
+
+		.separator {
+			height: 0;
+			border-top: 1px solid var(--border);
+			margin: 0.85rem 0;
+		}
+
+		.grid-2 {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.625rem;
+		}
+
+		.spinner {
+			width: 16px;
+			height: 16px;
+			border: 2px solid var(--border);
+			border-top-color: var(--foreground);
+			border-radius: 50%;
+			animation: spin 0.7s linear infinite;
+		}
+
+		@keyframes spin {
+			to {
+				transform: rotate(360deg);
+			}
+		}
+
+		.empty-state {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			color: var(--muted-foreground);
+			gap: 0.75rem;
+			text-align: center;
+			padding: 2rem;
+		}
+
+		.empty-state svg {
+			width: 48px;
+			height: 48px;
+			opacity: 0.3;
+		}
+
+		.empty-state p {
+			font-size: 0.875rem;
+			margin: 0;
+		}
+
+		.footer {
+			font-size: 0.6875rem;
+			color: var(--muted-foreground);
+			text-align: center;
+			padding: 1rem 0 0.5rem;
+			border-top: 1px solid var(--border-subtle);
+			margin-top: auto;
+			opacity: 0.7;
+		}
+
+		.footer span {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.375rem;
+		}
+
+		@media (max-width: 380px) {
+			.sidebar {
+				padding: 0.75rem;
+				max-height: 38vh;
+			}
+
+			.main-content {
+				padding: 0.75rem 0.5rem;
+			}
+
+			.season-grid {
+				gap: 0.25rem;
+				padding: 0.375rem;
+			}
+
+			.ep-badge {
+				min-width: 2.25rem;
+				height: 1.75rem;
+				font-size: 0.6875rem;
+			}
+
+			.checkbox-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.skip-type-selector {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.time-input-fields input {
+				width: 2.5rem;
+				height: 2rem;
+				font-size: 0.875rem;
+			}
+		}
+
+		.timeline-wrapper {
+			display: flex;
+			gap: 0.75rem;
+			align-items: stretch;
+			height: 56px;
+		}
+
+		.timeline-wrapper .timeline-track {
+			flex: 1;
+			height: 100%;
+		}
+
+		.scroll-wheel.horizontal .scroll-wheel-ridges {
+			top: 0;
+			bottom: 0;
+			left: -20px;
+			right: -20px;
+			background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0px, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px);
+		}
+
+		.skip-editor {
+			/* background: var(--card);
+			border: 1px solid var(--border-subtle); */
+			border-radius: calc(var(--radius) - 5px);
+			padding: 1rem;
+		}
+
+		.skip-editor-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.skip-editor-title {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: var(--foreground);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.skip-editor-title svg {
+			color: var(--success);
+		}
+
+		.timeline-container {
+			background: var(--background);
+			border-radius: calc(var(--radius) - 2px);
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+			border: 1px solid var(--border-subtle);
+		}
+
+		.timeline-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.75rem;
+		}
+
+		.timeline-controls {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.timeline-buttons {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.timeline-label {
+			font-size: 0.75rem;
+			font-weight: 500;
+			color: var(--muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.timeline-value {
+			font-family: "JetBrains Mono", monospace;
+			font-size: 0.875rem;
+			color: var(--foreground);
+			background: var(--secondary);
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+		}
+
+		.timeline-track {
+			position: relative;
+			height: 48px;
+			background: linear-gradient(90deg, var(--border-subtle) 0%, var(--muted) 100%);
+			border-radius: 6px;
+			cursor: pointer;
+			overflow: hidden;
+		}
+
+		.timeline-progress {
+			position: absolute;
+			height: 100%;
+			background: linear-gradient(90deg, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.5) 50%, rgba(34, 197, 94, 0.3) 100%);
+			border-radius: 6px;
+			pointer-events: none;
+			transition: width 0.1s ease;
+		}
+
+		.timeline-selection {
+			position: absolute;
+			height: 100%;
+			background: linear-gradient(180deg, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0.6) 100%);
+			border-left: 3px solid var(--skip-ed-accent);
+			border-right: 3px solid var(--skip-ed-accent);
+			cursor: grab;
+			transition: background 0.15s ease;
+		}
+
+		.timeline-selection:active {
+			cursor: grabbing;
+			background: linear-gradient(180deg, rgba(99, 102, 241, 0.5) 0%, rgba(99, 102, 241, 0.7) 100%);
+		}
+
+		.timeline-handle {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 14px;
+			height: 32px;
+			background: var(--foreground);
+			border-radius: 4px;
+			cursor: ew-resize;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+			transition: transform 0.1s ease;
+			z-index: 10;
+		}
+
+		.timeline-handle::after {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 4px;
+			height: 16px;
+			background: repeating-linear-gradient(180deg, var(--background) 0px, var(--background) 2px, transparent 2px, transparent 4px);
+			border-radius: 2px;
+		}
+
+		.timeline-handle:hover {
+			transform: translateY(-50%) scale(1.1);
+		}
+
+		.timeline-handle.start {
+			left: -7px;
+		}
+
+		.timeline-handle.end {
+			right: -7px;
+		}
+
+		.timeline-ticks {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 0.5rem;
+			padding: 0 0.25rem;
+			margin-left: calc(28px + 0.75rem);
+		}
+
+		.timeline-tick {
+			font-size: 0.625rem;
+			color: var(--muted-foreground);
+			font-family: "JetBrains Mono", monospace;
+		}
+
+		.time-inputs {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+			max-width: 100%;
+			overflow: hidden;
+		}
+
+		.time-input-group {
+			background: var(--background);
+			border: 1px solid var(--border-subtle);
+			border-radius: calc(var(--radius) - 2px);
+			padding: 0.875rem;
+			min-width: 0;
+			overflow: hidden;
+		}
+
+		.time-input-label {
+			font-size: 0.6875rem;
+			font-weight: 500;
+			color: var(--muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.5rem;
+		}
+
+		.time-input-fields {
+			display: flex;
+			align-items: center;
+			gap: 0.375rem;
+		}
+
+		.time-input-fields input {
+			width: 48px;
+			height: 2rem;
+			text-align: center;
+			font-family: "JetBrains Mono", monospace;
+			font-size: 1rem;
+			font-weight: 500;
+			padding: 0;
+			border-radius: 4px;
+		}
+
+		.time-input-fields[mode="seconds"] input {
+			width: 100%;
+			text-align: left;
+			padding-left: 0.6rem;
+		}
+
+		.time-input-fields .time-separator {
+			font-size: 1.25rem;
+			color: var(--muted-foreground);
+			font-weight: 600;
+		}
+
+		.mobile-unit {
+			display: none;
+		}
+
+		@media (max-width: 430px) {
+			.time-input-fields {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				align-items: center;
+				gap: 0.25rem 0.5rem;
+				width: 100%;
+			}
+
+			.time-input-fields input {
+				width: 100% !important;
+				height: 2.25rem !important;
+			}
+
+			.time-input-fields .time-separator {
+				display: none;
+			}
+
+			.mobile-unit {
+				display: block;
+				font-size: 0.75rem;
+				color: var(--muted-foreground);
+				font-weight: 500;
+			}
+		}
+
+		.skip-type-selector {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.skip-type-btn {
+			flex: 1;
+			height: 2.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.375rem;
+			background: var(--background);
+			border: 1px solid var(--border-subtle);
+			border-radius: calc(var(--radius) - 2px);
+			color: var(--muted-foreground);
+			font-size: 0.8125rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.skip-type-btn:hover {
+			border-color: var(--ring);
+			color: var(--foreground);
+		}
+
+		.skip-type-btn.active {
+			background: var(--foreground);
+			color: var(--background);
+			border-color: var(--foreground);
+		}
+
+		.skip-type-btn.active.op {
+			background: linear-gradient(135deg, var(--success), var(--success-strong));
+			border-color: var(--success);
+			color: var(--white);
+		}
+
+		.skip-type-btn.active.ed {
+			background: linear-gradient(135deg, var(--skip-ed-start), var(--skip-ed-end));
+			border-color: var(--skip-ed-start);
+			color: var(--white);
+		}
+
+		.skip-type-btn.active.recap {
+			background: linear-gradient(135deg, var(--warning), var(--skip-recap-end));
+			border-color: var(--warning);
+			color: var(--white);
+		}
+
+		.skip-type-btn.active.mixed-op {
+			background: linear-gradient(135deg, var(--skip-mixed-op-start), var(--skip-mixed-op-end));
+			border-color: var(--skip-mixed-op-start);
+			color: var(--white);
+		}
+
+		.skip-type-btn.active.mixed-ed {
+			background: linear-gradient(135deg, var(--skip-mixed-ed-start), var(--skip-mixed-ed-end));
+			border-color: var(--skip-mixed-ed-start);
+			color: var(--white);
+		}
+
+		.vote-container {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.vote-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.375rem;
+			padding: 0.375rem 0.75rem;
+			border-radius: 6px;
+			font-size: 0.75rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			border: 1px solid var(--border-subtle);
+			background: var(--card);
+			color: var(--muted-foreground);
+		}
+
+		.vote-btn:hover {
+			border-color: var(--ring);
+			color: var(--foreground);
+		}
+
+		.vote-btn.upvote:hover {
+			background: var(--success-muted);
+			border-color: var(--success);
+			color: var(--success);
+		}
+
+		.vote-btn.downvote:hover {
+			background: var(--destructive-muted);
+			border-color: var(--destructive);
+			color: var(--destructive);
+		}
+
+		.vote-btn.voted {
+			pointer-events: none;
+		}
+
+		.vote-btn.upvote.voted {
+			background: var(--success-muted);
+			border-color: var(--success);
+			color: var(--success);
+		}
+
+		.vote-btn.downvote.voted {
+			background: var(--destructive-muted);
+			border-color: var(--destructive);
+			color: var(--destructive);
+		}
+
+		.submit-section {
+			background: var(--card);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius);
+			padding: 1.25rem;
+			margin-top: 1rem;
+		}
+
+		.submit-header {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.submit-header svg {
+			color: var(--warning);
+		}
+
+		.submit-info {
+			font-size: 0.75rem;
+			color: var(--muted-foreground);
+			background: var(--warning-muted);
+			border: 1px solid rgba(245, 158, 11, 0.2);
+			border-radius: calc(var(--radius) - 2px);
+			padding: 0.75rem;
+			margin-bottom: 1rem;
+			line-height: 1.5;
+		}
+
+		.provider-input {
+			margin-bottom: 1rem;
+		}
+
+		.skip-card {
+			background: var(--card);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius);
+			padding: 1rem;
+			margin-bottom: 0.75rem;
+			transition: all 0.2s ease;
+		}
+
+		.skip-card:hover {
+			border-color: var(--ring);
+		}
+
+		.skip-card.imported {
+			background: rgba(99, 102, 241, 0.05);
+			border-color: rgba(99, 102, 241, 0.2);
+		}
+
+		.skip-card.imported:hover {
+			border-color: rgba(99, 102, 241, 0.5);
+			background: rgba(99, 102, 241, 0.1);
+		}
+
+		.skip-card-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.5rem;
+		}
+
+		.skip-card-type {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.375rem;
+			font-size: 0.75rem;
+			font-weight: 600;
+			padding: 0.25rem 0.625rem;
+			border-radius: 4px;
+			text-transform: uppercase;
+		}
+
+		.skip-card-type.op {
+			background: var(--success-muted);
+			color: var(--success-accent);
+		}
+
+		.skip-card-type.ed {
+			background: rgba(99, 102, 241, 0.15);
+			color: var(--skip-ed-accent);
+		}
+
+		.skip-card-type.recap {
+			background: var(--warning-muted);
+			color: var(--warning-accent);
+		}
+
+		.skip-card-times {
+			font-family: "JetBrains Mono", monospace;
+			font-size: 0.875rem;
+			color: var(--foreground);
+		}
+
+		.skip-card-meta {
+			font-size: 0.6875rem;
+			color: var(--muted-foreground);
+			margin-top: 0.25rem;
+		}
+
+		.skip-card-delete {
+			background: transparent;
+			border: 1px solid var(--border-subtle);
+			border-radius: 6px;
+			width: 28px;
+			height: 28px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			color: var(--muted-foreground);
+			flex-shrink: 0;
+		}
+
+		.skip-card-delete:hover {
+			background: var(--destructive-muted);
+			border-color: var(--destructive);
+			color: var(--destructive);
+		}
+
+		.skip-card-delete:active {
+			transform: scale(0.95);
+		}
+
+		.skip-card-header-left {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.skip-card-header-right {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.tabs {
+			display: flex;
+			border-bottom: 1px solid var(--border-subtle);
+			margin-bottom: 0;
+			position: sticky;
+			top: 0;
+			z-index: 20;
+			background: var(--background);
+		}
+
+		.tab {
+			background: none;
+			border: none;
+			font: inherit;
+			padding: 0.75rem 1rem;
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--muted-foreground);
+			cursor: pointer;
+			border-bottom: 2px solid transparent;
+			transition: all 0.2s ease;
+			margin-bottom: -1px;
+		}
+
+		.tab:hover {
+			color: var(--foreground);
+		}
+
+		.tab.active {
+			color: var(--foreground);
+			border-bottom-color: var(--foreground);
+		}
+
+		.tab-content {
+			display: none;
+			padding-top: 1rem;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+
+		.duration-display {
+			display: none;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1rem;
+			background: var(--secondary);
+			border-radius: calc(var(--radius) - 2px);
+			margin-bottom: 1rem;
+		}
+
+		.duration-label {
+			font-size: 0.75rem;
+			color: var(--muted-foreground);
+		}
+
+		.duration-value {
+			font-family: "JetBrains Mono", monospace;
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--foreground);
+		}
+
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			right: 2rem;
+			padding: 0.875rem 1.5rem;
+			border-radius: var(--radius);
+			will-change: transform, opacity;
+			font-size: 0.875rem;
+			font-weight: 500;
+			z-index: 100;
+			box-shadow:
+				0 10px 40px -10px rgba(0, 0, 0, 0.5),
+				0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+			animation: toastEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.toast.closing {
+			animation: toastExit 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+			pointer-events: none;
+		}
+
+		.toast.success {
+			background: rgba(34, 197, 94, 0.9);
+			color: var(--white);
+			border: 1px solid rgba(34, 197, 94, 0.5);
+		}
+
+		.toast.error {
+			background: rgba(220, 38, 38, 0.9);
+			color: var(--white);
+			border: 1px solid rgba(220, 38, 38, 0.5);
+		}
+
+		@media (max-width: 900px) {
+			body {
+				font-size: 0.8125rem;
+			}
+
+			.layout {
+				grid-template-rows: auto 1fr;
+				height: 100vh;
+				height: 100dvh;
+			}
+
+			.sidebar {
+				padding: 1rem;
+				gap: 1rem;
+				max-height: 40vh;
+			}
+
+			.main-content {
+				padding: 1rem 0.75rem;
+				gap: 1rem;
+				min-height: 0;
+			}
+
+			.output-header {
+				padding-bottom: 0.875rem;
+				margin-bottom: 0.75rem;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.output-header h2 {
+				font-size: 1rem;
+			}
+
+			.season-grid {
+				display: flex;
+				flex-wrap: nowrap;
+				gap: 0.375rem;
+				min-height: 3rem;
+				max-height: 3rem;
+				overflow-x: auto;
+				overflow-y: hidden;
+				padding: 0.5rem;
+				margin-bottom: 0.75rem;
+				background: var(--background);
+				border-radius: var(--radius);
+				border: 1px solid var(--border-subtle);
+				-webkit-overflow-scrolling: touch;
+				align-items: center;
+			}
+
+			.ep-badge {
+				height: 2rem;
+				min-width: 2.5rem;
+				flex-shrink: 0;
+				font-size: 0.75rem;
+			}
+
+			.code-container {
+				flex: 1;
+				min-height: 200px;
+			}
+
+			.code-scroll {
+				padding: 0 0.8rem 0.8rem 0.8rem;
+				font-size: 0.75rem;
+			}
+
+			.code-actions {
+				padding: 0.5rem 0.75rem;
+			}
+
+			.code-actions span {
+				font-size: 0.6875rem;
+			}
+
+			.form-section {
+				padding: 0.875rem;
+			}
+
+			h2 {
+				font-size: 1rem;
+			}
+
+			.section-title {
+				font-size: 0.75rem;
+				margin-bottom: 0.625rem;
+			}
+
+			label {
+				font-size: 0.75rem;
+			}
+
+			input[type="text"],
+			input[type="number"] {
+				height: 2.625rem;
+				font-size: 1rem;
+				padding: 0 0.75rem;
+			}
+
+			.checkbox-grid {
+				grid-template-columns: 1fr 1fr;
+				gap: 0.5rem;
+			}
+
+			.checkbox-wrapper {
+				padding: 0.625rem 0.5rem;
+			}
+
+			.custom-checkbox {
+				width: 1.25rem;
+				height: 1.25rem;
+			}
+
+			.checkbox-label {
+				font-size: 0.75rem;
+			}
+
+			.btn {
+				height: 2.625rem;
+				font-size: 0.875rem;
+			}
+
+			.btn-icon {
+				width: 2.625rem;
+			}
+
+			.grid-2 {
+				gap: 0.5rem;
+			}
+
+			.search-results {
+				max-height: 50vh;
+			}
+
+			.search-results-content {
+				max-height: 45vh;
+			}
+
+			.search-item {
+				padding: 0.625rem 0.75rem;
+			}
+
+			.search-item img {
+				width: 32px;
+				height: 46px;
+			}
+
+			.search-text b {
+				font-size: 0.75rem;
+			}
+
+			.search-text span {
+				font-size: 0.6875rem;
+			}
+
+			.tabs {
+				flex-wrap: nowrap;
+				gap: 0;
+			}
+
+			.tab {
+				padding: 0.625rem 0.75rem;
+				font-size: 0.75rem;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			.skip-editor {
+				padding: 0;
+			}
+
+			.skip-editor-title {
+				font-size: 0.8125rem;
+			}
+
+			.duration-display {
+				padding: 0.625rem 0.875rem;
+			}
+
+			.duration-label {
+				font-size: 0.6875rem;
+			}
+
+			.duration-value {
+				font-size: 0.8125rem;
+			}
+
+			.timeline-container {
+				padding: 1rem;
+			}
+
+			.timeline-track {
+				height: 56px;
+			}
+
+			.timeline-handle {
+				width: 20px;
+				height: 40px;
+				touch-action: none;
+			}
+
+			.timeline-handle.start {
+				left: -10px;
+			}
+
+			.timeline-handle.end {
+				right: -10px;
+			}
+
+			.timeline-selection {
+				touch-action: none;
+			}
+
+			.timeline-label {
+				font-size: 0.6875rem;
+			}
+
+			.timeline-value {
+				font-size: 0.8125rem;
+				padding: 0.375rem 0.625rem;
+			}
+
+			.timeline-tick {
+				font-size: 0.5625rem;
+			}
+
+			.time-inputs {
+				gap: 0.625rem;
+			}
+
+			.time-input-group {
+				padding: 0.75rem;
+			}
+
+			.time-input-label {
+				font-size: 0.625rem;
+				margin-bottom: 0.375rem;
+			}
+
+			.time-input-fields input {
+				width: 2.75rem;
+				height: 2.25rem;
+				font-size: 1rem;
+			}
+
+			.time-input-fields span {
+				font-size: 1rem;
+			}
+
+			.time-input-fields {
+				justify-content: space-between;
+			}
+
+			.skip-type-selector {
+				display: grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: 0.375rem;
+			}
+
+			.skip-type-btn {
+				height: 2.5rem;
+				font-size: 0.6875rem;
+				padding: 0 0.375rem;
+			}
+
+			.provider-input label {
+				margin-bottom: 0.375rem;
+			}
+
+			.submit-info {
+				font-size: 0.6875rem;
+				padding: 0.625rem;
+			}
+
+			.skip-card {
+				padding: 0.875rem;
+			}
+
+			.skip-card-header {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 0.375rem;
+			}
+
+			.skip-card-type {
+				font-size: 0.6875rem;
+			}
+
+			.skip-card-times {
+				font-size: 0.8125rem;
+			}
+
+			.skip-card-meta {
+				font-size: 0.625rem;
+			}
+
+			.vote-container {
+				flex-direction: row;
+			}
+
+			.vote-btn {
+				flex: 1;
+				padding: 0.5rem;
+				font-size: 0.6875rem;
+			}
+
+			.toast {
+				left: 1rem;
+				right: 1rem;
+				bottom: 1rem;
+				text-align: center;
+			}
+
+			.empty-state {
+				padding: 1.5rem;
+			}
+
+			.empty-state svg {
+				width: 36px;
+				height: 36px;
+			}
+
+			.empty-state p {
+				font-size: 0.8125rem;
+			}
+
+			.layout {
+				grid-template-columns: 1fr;
+				grid-template-rows: auto 1fr;
+			}
+
+			.sidebar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: var(--sheet-height, var(--sheet-collapsed-height));
+				border-right: none;
+				max-height: none;
+				min-height: 0;
+				height: auto;
+				padding-bottom: 1rem;
+				overflow-y: auto;
+				overflow-x: hidden;
+				z-index: 40;
+				background: var(--background);
+			}
+
+			.sidebar::before {
+				display: none;
+			}
+
+			.sidebar.no-transition {
+				transition: none !important;
+			}
+
+			.layout {
+				height: 100vh;
+				height: 100dvh;
+				overflow: hidden;
+				background: var(--background);
+			}
+
+			.main-content {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 100vh;
+				height: 100dvh;
+				max-height: none;
+				border-radius: 1.25rem 1.25rem 0 0;
+				border-top: 1px solid var(--border);
+				box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+				transform: translateY(calc(100% - var(--sheet-height, var(--sheet-collapsed-height))));
+				transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				will-change: transform;
+				z-index: 50;
+				padding: 0 1rem 1rem;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+				background: var(--background-secondary);
+			}
+
+			.main-content::-webkit-scrollbar {
+				display: none;
+			}
+
+			.main-content.expanded {
+				transform: translateY(0);
+				border-radius: 0;
+			}
+
+			.main-content.collapsed {
+				overflow: hidden;
+			}
+
+			.main-content.dragging {
+				transition: none !important;
+			}
+
+			.sheet-handle {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 0.75rem 0 0.5rem;
+				cursor: grab;
+				touch-action: none;
+				user-select: none;
+			}
+
+			.sheet-handle:active {
+				cursor: grabbing;
+			}
+
+			.sheet-handle-bar {
+				width: 36px;
+				height: 4px;
+				background: var(--muted-foreground);
+				border-radius: 2px;
+				opacity: 0.5;
+				transition:
+					opacity 0.2s,
+					width 0.2s;
+			}
+
+			.sheet-handle:hover .sheet-handle-bar,
+			.sheet-handle:active .sheet-handle-bar {
+				opacity: 0.8;
+				width: 44px;
+			}
+
+			.toast {
+				right: 0;
+				left: 0;
+				margin: 0 auto;
+				bottom: 1.5rem;
+				width: calc(100% - 2rem);
+				max-width: none;
+				justify-content: flex-start;
+			}
+		}
+
+		@media (max-width: 600px) {
+
+			*,
+			*::before,
+			*::after {
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				-webkit-touch-callout: none;
+			}
+
+			input,
+			textarea {
+				-webkit-user-select: text;
+				-moz-user-select: text;
+				-ms-user-select: text;
+				user-select: text;
+			}
+
+			.skip-editor-header {
+				flex-direction: column;
+				align-items: stretch;
+				gap: 0.75rem;
+			}
+
+			.editor-header-actions {
+				width: 100%;
+			}
+
+			.editor-action-btn {
+				flex: 1;
+				width: 100% !important;
+				justify-content: center;
+			}
+		}
+
+		@media (max-width: 500px) {
+			.timeline-wrapper {
+				flex-direction: column;
+				height: auto;
+				gap: 1rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.timeline-wrapper .scroll-wheel {
+				width: 100% !important;
+				height: 28px !important;
+				order: 2;
+				margin-top: 0.25rem;
+			}
+
+			.timeline-wrapper .timeline-track {
+				height: 48px !important;
+				width: 100%;
+				flex: none;
+				order: 1;
+			}
+
+			.time-input-group>div {
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.scroll-wheel {
+				width: 100% !important;
+				height: 28px !important;
+			}
+
+			.scroll-wheel-ridges {
+				top: 0;
+				bottom: 0;
+				left: -20px;
+				right: -20px;
+				background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0px, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px);
+			}
+
+			.scroll-wheel::after {
+				background: linear-gradient(90deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.8) 100%);
+			}
+
+			.scroll-wheel::before {
+				top: 0;
+				left: 50%;
+				right: auto;
+				bottom: 0;
+				width: 10px;
+				height: 100%;
+				transform: translateX(-50%);
+				background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+			}
+
+			.timeline-header {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.timeline-controls {
+				display: contents;
+			}
+
+			.timeline-label {
+				grid-row: 1;
+				grid-column: 1;
+				align-self: center;
+			}
+
+			.timeline-value {
+				grid-row: 1;
+				grid-column: 2;
+				justify-self: end;
+			}
+
+			.timeline-buttons {
+				grid-row: 2;
+				grid-column: 1 / -1;
+				width: 100%;
+				gap: 0.75rem;
+				margin-top: 0.25rem;
+			}
+
+			.timeline-buttons .btn {
+				width: 100% !important;
+				flex: 1;
+			}
+
+			.timeline-container {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
+
+			.timeline-wrapper {
+				display: contents;
+			}
+
+			.timeline-header {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				gap: 0.5rem;
+				align-items: center;
+				margin-bottom: 0.5rem;
+				order: 1;
+			}
+
+			.timeline-controls {
+				display: contents;
+			}
+
+			.timeline-label {
+				grid-row: 1;
+				grid-column: 1;
+				justify-self: start;
+			}
+
+			.timeline-value {
+				grid-row: 1;
+				grid-column: 2;
+				justify-self: end;
+			}
+
+			.timeline-buttons {
+				grid-row: 2;
+				grid-column: 1 / -1;
+				width: 100%;
+				display: flex;
+				gap: 0.5rem;
+				margin-top: 0.25rem;
+			}
+
+			.timeline-buttons .btn {
+				flex: 1;
+				width: auto !important;
+			}
+
+			.timeline-wrapper .timeline-track {
+				order: 2;
+				width: 100%;
+				flex: none;
+				margin-bottom: 0;
+			}
+
+			.timeline-ticks {
+				order: 3;
+				margin-top: 0;
+				margin-bottom: 0.5rem;
+				margin-left: 0;
+			}
+
+			.timeline-wrapper .scroll-wheel {
+				order: 4;
+				width: 100% !important;
+				height: 28px !important;
+				margin-top: 0;
+			}
+		}
+
+		@keyframes toastEnter {
+			from {
+				opacity: 0;
+				transform: translateY(1rem) scale(0.95);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		@keyframes toastExit {
+			from {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+
+			to {
+				opacity: 0;
+				transform: translateY(1rem) scale(0.95);
+			}
+		}
+
+		#collapseBtn {
+			display: none;
+		}
+
+		@media (min-width: 901px) {
+			#collapseBtn.visible {
+				display: inline-flex;
+			}
+		}
+
+		.season-grid {
+			transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			max-height: 1000px;
+			overflow-y: hidden;
+		}
+
+		.season-grid.collapsed-mode {
+			display: grid;
+			grid-template-columns: none;
+			grid-auto-flow: column;
+			grid-auto-columns: 3.25rem;
+			overflow-x: auto;
+			max-height: 6rem;
+			gap: 0.375rem;
+			padding: 0.75rem 0.25rem;
+			cursor: grab;
+		}
+
+		.season-grid.collapsed-mode:active {
+			cursor: grabbing;
+		}
+
+		.season-grid.active {
+			user-select: none;
+		}
+
+		.season-grid.active * {
+			pointer-events: none;
+		}
+
+		.season-grid.collapsed-mode .ep-badge {
+			min-width: 3.25rem;
+		}
+
+		#copyResultBtn {
+			transition:
+				background 0.2s,
+				border-color 0.2s,
+				color 0.2s,
+				box-shadow 0.2s !important;
+		}
+
+		.editor-header-actions {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+
+		.editor-action-btn {
+			width: auto !important;
+			height: 1.9rem;
+			padding: 0 0.7rem;
+			font-size: 0.75rem;
+		}
+
+		#gridContainer:empty {
+			display: none !important;
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+		}
+	</style>
+</head>
+
+<body>
+	<svg style="display: none" aria-hidden="true" focusable="false">
+		<defs>
+			<symbol id="icon-search" viewBox="0 0 15 15">
+				<path
+					d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464C13.0488 12.3417 13.0488 12.6583 12.8536 12.8536C12.6583 13.0488 12.3417 13.0488 12.1464 12.8536L9.30884 10.0159Z"
+					fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
+			</symbol>
+			<symbol id="icon-save" viewBox="0 0 24 24">
+				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				<polyline points="17 21 17 13 7 13 7 21" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+				<polyline points="7 3 7 8 15 8" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-check" viewBox="0 0 24 24">
+				<polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="4"
+					stroke-linecap="round" stroke-linejoin="round"></polyline>
+			</symbol>
+			<symbol id="icon-copy" viewBox="0 0 24 24">
+				<rect x="9" y="9" width="13" height="13" rx="2" ry="2" fill="none" stroke="currentColor"
+					stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor"
+					stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-terminal" viewBox="0 0 24 24">
+				<polyline points="16 18 22 12 16 6" fill="none" stroke="currentColor" stroke-width="1.5"
+					stroke-linecap="round" stroke-linejoin="round" />
+				<polyline points="8 6 2 12 8 18" fill="none" stroke="currentColor" stroke-width="1.5"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-arrow-right" viewBox="0 0 24 24">
+				<path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+					stroke-linejoin="round" />
+				<path d="M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+					stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-upvote" viewBox="0 0 24 24">
+				<path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-downvote" viewBox="0 0 24 24">
+				<path d="M12 5v14M5 12l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-plus" viewBox="0 0 24 24">
+				<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-switch" viewBox="0 0 24 24">
+				<path d="M21 12h-6l-3 5-3-5H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"></path>
+			</symbol>
+			<symbol id="icon-trash" viewBox="0 0 24 24">
+				<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-send" viewBox="0 0 24 24">
+				<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-grid" viewBox="0 0 24 24">
+				<rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+				<path d="M9 9h.01M15 9h.01M9 15h6" fill="none" stroke="currentColor" stroke-width="1.5"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+			<symbol id="icon-upload" viewBox="0 0 24 24">
+				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+				<polyline points="17 8 12 3 7 8" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+				<line x1="12" y1="3" x2="12" y2="15" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</symbol>
+		</defs>
+	</svg>
+	<div class="layout">
+		<aside class="sidebar">
+			<div>
+				<h2>Параметры</h2>
+				<p class="hint">Конфигурация запроса к Aniskip API</p>
+			</div>
+
+			<div class="form-group" style="position: relative">
+				<label>Поиск Jikan API</label>
+				<div style="display: flex; gap: 0.5rem">
+					<input type="text" id="searchTerm" value="Frieren" placeholder="Название..." autocomplete="off" />
+					<button class="btn btn-outline btn-icon" type="button" data-action="search-jikan">
+						<svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true">
+							<use href="#icon-search"></use>
+						</svg>
+					</button>
+					<button class="btn btn-outline btn-icon" type="button" data-action="save-search-settings"
+						title="Сохранить параметры">
+						<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-save"></use>
+						</svg>
+					</button>
+				</div>
+
+				<div id="searchResults" class="search-results">
+					<div id="searchResultsList" class="search-results-content"></div>
+				</div>
+			</div>
+
+			<div class="separator" style="margin: 0.5rem 0"></div>
+
+			<div class="form-group">
+				<label>MyAnimeList ID</label>
+				<input type="number" id="malId" value="52991" placeholder="Anime ID" />
+			</div>
+
+			<!-- <div class="form-group">
+				<label>Длительность (сек)</label>
+				<input type="number" id="epDur" value="0" placeholder="0" />
+				<p class="hint">По умолчанию 0 = нестрогий поиск.</p>
+			</div> -->
+
+			<div class="form-group">
+				<label style="margin-bottom: 0.75rem">Типы пропуска (Skip Types)</label>
+				<div class="checkbox-grid">
+					<label class="checkbox-wrapper">
+						<input type="checkbox" class="type-chk" value="op" checked />
+						<div class="custom-checkbox">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<use href="#icon-check"></use>
+							</svg>
+						</div>
+						<span class="checkbox-label">OP</span>
+					</label>
+					<label class="checkbox-wrapper">
+						<input type="checkbox" class="type-chk" value="ed" checked />
+						<div class="custom-checkbox">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<use href="#icon-check"></use>
+							</svg>
+						</div>
+						<span class="checkbox-label">ED</span>
+					</label>
+					<label class="checkbox-wrapper checkbox-full-width">
+						<input type="checkbox" class="type-chk" value="recap" checked />
+						<div class="custom-checkbox">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<use href="#icon-check"></use>
+							</svg>
+						</div>
+						<span class="checkbox-label">Recap</span>
+					</label>
+					<label class="checkbox-wrapper">
+						<input type="checkbox" class="type-chk" value="mixed-op" checked />
+						<div class="custom-checkbox">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<use href="#icon-check"></use>
+							</svg>
+						</div>
+						<span class="checkbox-label">Mixed-OP</span>
+					</label>
+					<label class="checkbox-wrapper">
+						<input type="checkbox" class="type-chk" value="mixed-ed" checked />
+						<div class="custom-checkbox">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<use href="#icon-check"></use>
+							</svg>
+						</div>
+						<span class="checkbox-label">Mixed-ED</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="separator"></div>
+
+			<div>
+				<div class="section-title">Одиночный запрос</div>
+				<div class="grid-2">
+					<input type="number" id="epNum" value="1" placeholder="№" />
+					<button class="btn btn-outline" type="button" data-action="fetch-single">Проверить</button>
+				</div>
+			</div>
+
+			<div>
+				<div class="section-title">Загрузка сезона</div>
+				<div class="grid-2" style="margin-bottom: 0.75rem">
+					<div style="position: relative">
+						<label style="font-size: 0.75rem; color: var(--muted-foreground)">С</label>
+						<input type="number" id="seasonStart" value="1" />
+					</div>
+					<div style="position: relative">
+						<label style="font-size: 0.75rem; color: var(--muted-foreground)">По</label>
+						<input type="number" id="seasonEnd" value="28" />
+					</div>
+				</div>
+				<button class="btn btn-primary" type="button" data-action="fetch-season">Загрузить диапазон</button>
+			</div>
+
+			<div class="separator" id="batchSeparator"></div>
+
+			<div id="batchSection">
+				<div class="section-title">Пакетная обработка</div>
+				<div class="grid-2">
+					<button class="btn btn-outline" type="button" data-action="import-json">
+						<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="margin-right: 0.5rem">
+							<use href="#icon-upload"></use>
+						</svg>
+						Импорт
+					</button>
+					<button class="btn btn-outline" type="button" data-action="bulk-send">
+						<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="margin-right: 0.5rem">
+							<use href="#icon-send"></use>
+						</svg>
+						Отправить
+					</button>
+				</div>
+				<input type="file" id="importFile" accept=".json" style="display: none" />
+			</div>
+
+			<div style="flex: 1"></div>
+		</aside>
+
+		<main class="main-content" id="mainContent">
+			<div class="sheet-handle" id="sheetHandle">
+				<div class="sheet-handle-bar"></div>
+			</div>
+
+			<div class="output-header">
+				<div>
+					<h2 id="resultTitle">Консоль</h2>
+					<p class="hint">Результаты запросов</p>
+				</div>
+				<button id="collapseBtn" class="btn btn-outline" type="button"
+					style="width: auto; height: 2rem; margin-right: 0.5rem" data-action="toggle-grid">Свернуть</button>
+				<button class="btn btn-outline" type="button" style="width: auto; height: 2rem"
+					data-action="clear-log">Очистить</button>
+			</div>
+
+			<div id="gridContainer"></div>
+
+			<div class="code-container">
+				<div class="code-actions">
+					<span id="codeLabel">Терминал</span>
+					<button id="copyResultBtn" class="btn btn-outline" type="button"
+						style="visibility: hidden; width: auto; height: 1.75rem; font-size: 0.75rem; padding: 0 0.75rem; gap: 0.375rem"
+						data-action="copy-json">
+						<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-copy"></use>
+						</svg>
+						Копировать
+					</button>
+				</div>
+				<div class="code-scroll" id="codeOutput">
+					<div class="empty-state">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-terminal"></use>
+						</svg>
+						<p>Ожидание действий...</p>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<template id="searchItemTemplate">
+		<button type="button" class="search-item">
+			<img />
+			<div class="search-text">
+				<b></b>
+				<span></span>
+			</div>
+		</button>
+	</template>
+
+	<template id="epBadgeTemplate">
+		<button type="button" class="ep-badge">
+			<div class="spinner"></div>
+		</button>
+	</template>
+
+	<template id="skipEditorTemplate">
+		<div class="skip-editor">
+			<div class="skip-editor-header">
+				<div class="skip-editor-title">
+					<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+						<use href="#icon-plus"></use>
+					</svg>
+					Добавить пропуск для Ep <span class="skip-editor-ep-num"></span>
+				</div>
+				<div class="editor-header-actions">
+					<button class="btn btn-outline btn-icon editor-action-btn" type="button"
+						data-action="toggle-time-mode">
+						<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-switch"></use>
+						</svg>
+						<span style="margin-left: 4px; font-weight: 600"></span>
+					</button>
+					<button class="btn btn-outline btn-icon editor-action-btn" type="button"
+						data-action="save-manual-duration" title="Сохранить текущую длительность для этого типа">
+						<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-save"></use>
+						</svg>
+					</button>
+					<button class="btn btn-outline btn-icon editor-action-btn" type="button"
+						data-action="reset-manual-duration" title="Сбросить ручную длительность">
+						<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-trash"></use>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<div class="duration-display">
+				<span class="duration-label">Длительность эпизода</span>
+				<span class="duration-value"></span>
+			</div>
+
+			<div class="timeline-container">
+				<div class="timeline-header">
+					<span class="timeline-label">Выберите диапазон</span>
+					<div class="timeline-controls">
+						<span class="timeline-value" id="selectionDisplay">00:00 → 01:30</span>
+					</div>
+				</div>
+				<div class="timeline-wrapper">
+					<div class="scroll-wheel" id="timelineScroll">
+						<div class="scroll-wheel-ridges"></div>
+					</div>
+					<div class="timeline-track" id="timelineTrack">
+						<div class="timeline-selection" id="timelineSelection" style="left: 0%; width: 10%">
+							<div class="timeline-handle start" id="handleStart"></div>
+							<div class="timeline-handle end" id="handleEnd"></div>
+						</div>
+					</div>
+				</div>
+				<div class="timeline-ticks">
+					<span class="timeline-tick">0</span>
+					<span class="timeline-tick"></span>
+					<span class="timeline-tick"></span>
+					<span class="timeline-tick"></span>
+					<span class="timeline-tick"></span>
+				</div>
+			</div>
+
+			<div class="time-inputs">
+				<div class="time-input-group">
+					<div class="time-input-label">Начало</div>
+					<div style="display: flex; gap: 0.5rem; align-items: stretch">
+						<div class="time-input-fields">
+							<input type="number" id="startMins" value="0" min="0" max="99" />
+							<span class="mobile-unit">Мин.</span>
+							<span class="time-separator">:</span>
+							<input type="number" id="startSecs" value="0" min="0" max="59" />
+							<span class="mobile-unit">Сек.</span>
+						</div>
+						<div class="time-input-fields" mode="seconds" style="flex: 1">
+							<input type="number" id="startAbsSecs" value="0" min="0" max="0" step="1" />
+							<span class="mobile-unit"
+								style="display: inline; margin-left: 6px; white-space: nowrap; font-size: 0.75rem">Сек.</span>
+						</div>
+						<div class="scroll-wheel" id="startScroll" style="height: 2.25rem">
+							<div class="scroll-wheel-ridges"></div>
+						</div>
+					</div>
+				</div>
+				<div class="time-input-group">
+					<div class="time-input-label">Конец</div>
+					<div style="display: flex; gap: 0.5rem; align-items: stretch">
+						<div class="time-input-fields">
+							<input type="number" id="endMins" value="1" min="0" max="99" />
+							<span class="mobile-unit">Мин.</span>
+							<span class="time-separator">:</span>
+							<input type="number" id="endSecs" value="30" min="0" max="59" />
+							<span class="mobile-unit">Сек.</span>
+						</div>
+						<div class="time-input-fields" mode="seconds" style="flex: 1">
+							<input type="number" id="endAbsSecs" value="0" min="0" max="0" step="1" />
+							<span class="mobile-unit"
+								style="display: inline; margin-left: 6px; white-space: nowrap; font-size: 0.75rem">Сек.</span>
+						</div>
+						<div class="scroll-wheel" id="endScroll" style="height: 2.25rem">
+							<div class="scroll-wheel-ridges"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="skip-type-selector" style="flex-wrap: wrap">
+				<button class="skip-type-btn op" type="button" data-type="op">OP</button>
+				<button class="skip-type-btn ed" type="button" data-type="ed">ED</button>
+				<button class="skip-type-btn recap" type="button" data-type="recap">Recap</button>
+				<button class="skip-type-btn mixed-op" type="button" data-type="mixed-op">M-OP</button>
+				<button class="skip-type-btn mixed-ed" type="button" data-type="mixed-ed">M-ED</button>
+			</div>
+
+			<div class="provider-input">
+				<label>Источник (Provider Name)</label>
+				<div style="display: flex; gap: 0.5rem">
+					<input type="text" id="providerName" placeholder="Ваш никнейм..." style="flex: 1" />
+					<button class="btn btn-outline btn-icon" type="button" data-action="save-default-provider"
+						title="Сохранить по умолчанию" style="flex-shrink: 0">
+						<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
+							<use href="#icon-save"></use>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<div class="submit-info">
+				⚠️ Данные будут отправлены в публичную базу AniSkip. Убедитесь, что таймкоды точные!<br />
+				<strong>Ваш ID:</strong> <code class="submitter-id" style="font-size: 0.7rem"></code>
+			</div>
+
+			<button class="btn btn-primary" type="button" data-action="submit-skip">
+				<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="margin-right: 0.5rem">
+					<use href="#icon-send"></use>
+				</svg>
+				Отправить в AniSkip
+			</button>
+		</div>
+	</template>
+
+	<script>
+		(() => {
+			const ANISKIP_BASE = "https://api.aniskip.com/v2/skip-times";
+			const ANISKIP_VOTE_BASE = "https://api.aniskip.com/v2/skip-times/vote";
+			const SHOW_BATCH_PROCESSING = false;
+
+			const $ = (id) => document.getElementById(id);
+
+			let expandSheet = null;
+			let collapseSheet = null;
+
+			/** Единое состояние приложения */
+			const AppState = {
+				realEpisodeDuration: 1440,
+				jikanDuration: 1440,
+				timeInputMode: localStorage.getItem("aniskip_time_mode") || "min-sec",
+				selectedSkipType: "op",
+				smartIntervals: {},
+				manualDurations: JSON.parse(localStorage.getItem("aniskip_manual_durations") || "{}"),
+				epDuration: 1440,
+				seasonResults: new Map(),
+				timelineController: null,
+				scrollWheels: [],
+				currentEp: 0,
+			};
+
+			/** Утилиты для работы со временем */
+			class TimeUtils {
+				static fmt(totalSeconds) {
+					const secs = Math.max(0, Math.floor(totalSeconds));
+					const mins = Math.floor(secs / 60);
+					const restSecs = secs % 60;
+					return `${mins.toString().padStart(2, "0")}:${restSecs.toString().padStart(2, "0")}`;
+				}
+
+				static toSeconds(mins, secs) {
+					return (parseInt(mins, 10) || 0) * 60 + (parseInt(secs, 10) || 0);
+				}
+
+				static parseDuration(str) {
+					if (!str) return 0;
+					const minMatch = str.match(/(\d+)\s*min/);
+					const hrMatch = str.match(/(\d+)\s*hr/);
+					let m = 0;
+					if (hrMatch) m += parseInt(hrMatch[1], 10) * 60;
+					if (minMatch) m += parseInt(minMatch[1], 10);
+					return m > 0 ? m * 60 : 0;
+				}
+			}
+
+			/** Сервис общения с API */
+			const ApiService = {
+				searchAnime: async (query) => {
+					const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`);
+					const json = await res.json();
+					return json.data || [];
+				},
+
+				getAnimeById: async (malId) => {
+					const res = await fetch(`https://api.jikan.moe/v4/anime/${malId}`);
+					const json = await res.json();
+					return json.data || null;
+				},
+
+				getSkipTimes: async (malId, ep, types, episodeLength) => {
+					const params = new URLSearchParams();
+					(types || []).forEach((t) => params.append("types", t));
+					params.append("episodeLength", episodeLength);
+					const url = `${ANISKIP_BASE}/${malId}/${ep}?${params.toString()}`;
+					const res = await fetch(url);
+					return res.json();
+				},
+
+				/** Отправка skip time */
+				submitSkip: async (malId, ep, payload) => {
+					const res = await fetch(`${ANISKIP_BASE}/${malId}/${ep}`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(payload),
+					});
+					const data = await res.json();
+					return { res, data };
+				},
+
+				/** Голосование */
+				vote: async (skipId, voteType) => {
+					const res = await fetch(`${ANISKIP_VOTE_BASE}/${skipId}`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ voteType }),
+					});
+					let data = {};
+					try {
+						data = await res.json();
+					} catch (_) { }
+					return { res, data };
+				},
+			};
+
+			const getSubmitterId = () => {
+				let id = localStorage.getItem("aniskip_submitter_id");
+				if (!id) {
+					id = crypto.randomUUID
+						? crypto.randomUUID()
+						: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+							const r = (Math.random() * 16) | 0;
+							return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+						});
+					localStorage.setItem("aniskip_submitter_id", id);
+				}
+				return id;
+			};
+
+			const getDefaultProvider = () => localStorage.getItem("aniskip_provider_name") || "Aniskip";
+
+			const saveDefaultProvider = () => {
+				const name = $("providerName")?.value || "Aniskip";
+				localStorage.setItem("aniskip_provider_name", name);
+				showToast("Ник сохранён по умолчанию!", "success");
+			};
+
+			const formatTimeDisplay = (totalSeconds) => {
+				if (AppState.timeInputMode === "seconds") {
+					return Math.round(totalSeconds) + "с";
+				}
+				return TimeUtils.fmt(totalSeconds);
+			};
+
+			const formatTimeDetailed = (totalSeconds) => {
+				const ms = Math.round((totalSeconds % 1) * 1000);
+				return `${TimeUtils.fmt(totalSeconds)}.${ms.toString().padStart(3, "0")}`;
+			};
+
+			const getTypes = () => Array.from(document.querySelectorAll(".type-chk:checked")).map((cb) => cb.value);
+
+			function syntaxHighlight(json) {
+				if (typeof json !== "string") {
+					json = JSON.stringify(json, undefined, 2);
+				}
+				json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+				return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+					let cls = "sh-num";
+					if (/^"/.test(match)) {
+						if (/:$/.test(match)) {
+							cls = "sh-key";
+						} else {
+							cls = "sh-str";
+						}
+					} else if (/true|false/.test(match)) {
+						cls = "sh-bool";
+					} else if (/null/.test(match)) {
+						cls = "sh-null";
+					}
+					return '<span class="' + cls + '">' + match + "</span>";
+				});
+			}
+
+			function showToast(message, type = "success") {
+				const existing = document.querySelector(".toast");
+				if (existing) existing.remove();
+
+				const toast = document.createElement("div");
+				toast.className = `toast ${type}`;
+				toast.textContent = message;
+
+				document.body.appendChild(toast);
+
+				setTimeout(() => {
+					toast.classList.add("closing");
+					toast.addEventListener("animationend", () => {
+						if (toast.parentNode) toast.remove();
+					});
+				}, 3000);
+			}
+
+			function clearLog() {
+				$("gridContainer").innerHTML = "";
+				$("codeOutput").innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow-right"></use></svg><p>Консоль очищена</p></div>';
+				$("codeLabel").innerText = "Терминал";
+				$("resultTitle").innerText = "Консоль";
+
+				const collapseBtn = $("collapseBtn");
+				if (collapseBtn) collapseBtn.classList.remove("visible");
+
+				const copyBtn = $("copyResultBtn");
+				if (copyBtn) copyBtn.style.visibility = "hidden";
+
+				if (typeof collapseSheet === "function") collapseSheet();
+			}
+
+			function saveSearchSettings() {
+				const settings = {
+					searchTerm: $("searchTerm").value,
+					malId: $("malId").value,
+					epDur: $("epDur") ? $("epDur").value : "0",
+					seasonStart: $("seasonStart").value,
+					seasonEnd: $("seasonEnd").value,
+					types: {},
+				};
+
+				const checkboxes = document.querySelectorAll(".type-chk");
+				checkboxes.forEach((cb) => {
+					settings.types[cb.value] = cb.checked;
+				});
+
+				localStorage.setItem("aniskip_search_settings", JSON.stringify(settings));
+				showToast("Параметры сохранены!", "success");
+			}
+
+			function loadSearchSettings() {
+				const settingsStr = localStorage.getItem("aniskip_search_settings");
+				if (!settingsStr) return;
+
+				try {
+					const settings = JSON.parse(settingsStr);
+					if (settings.searchTerm !== undefined) $("searchTerm").value = settings.searchTerm;
+					if (settings.malId !== undefined) $("malId").value = settings.malId;
+					if (settings.epDur !== undefined && $("epDur")) $("epDur").value = settings.epDur;
+					if (settings.seasonStart !== undefined) $("seasonStart").value = settings.seasonStart;
+					if (settings.seasonEnd !== undefined) $("seasonEnd").value = settings.seasonEnd;
+
+					if (settings.types) {
+						const checkboxes = document.querySelectorAll(".type-chk");
+						checkboxes.forEach((cb) => {
+							if (settings.types[cb.value] !== undefined) {
+								cb.checked = settings.types[cb.value];
+							}
+						});
+					}
+				} catch (e) {
+					console.error("Failed to load settings:", e);
+				}
+			}
+			loadSearchSettings();
+			initGridState();
+
+			const searchJikan = async () => {
+				const q = $("searchTerm").value.trim();
+				const resultsWrapper = $("searchResults");
+				const resultsList = $("searchResultsList");
+
+				if (!q) return;
+
+				resultsWrapper.classList.add("active");
+				resultsList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--muted-foreground); font-size:0.8rem;">Загрузка...</div>';
+
+				try {
+					const items = await ApiService.searchAnime(q);
+					resultsList.innerHTML = "";
+
+					if (!items || items.length === 0) {
+						resultsList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--muted-foreground)">Ничего не найдено</div>';
+						setTimeout(() => resultsWrapper.classList.remove("active"), 2000);
+						return;
+					}
+
+					const searchTpl = $("searchItemTemplate");
+					items.forEach((item) => {
+						const dur = TimeUtils.parseDuration(item.duration);
+						const totalEps = item.episodes || "?";
+
+						const node = searchTpl.content.cloneNode(true);
+						const btn = node.querySelector(".search-item");
+						if (!btn) return;
+
+						btn.dataset.malId = item.mal_id;
+						btn.dataset.duration = dur;
+						if (item.episodes) btn.dataset.episodes = item.episodes;
+
+						const img = btn.querySelector("img");
+						if (img) img.src = item.images.jpg.small_image_url;
+						const titleEl = btn.querySelector("b");
+						if (titleEl) titleEl.textContent = item.title;
+						const metaEl = btn.querySelector("span");
+						if (metaEl) metaEl.textContent = `MAL: ${item.mal_id} • Ep: ${totalEps} • ${dur}s`;
+
+						resultsList.appendChild(node);
+					});
+				} catch (e) {
+					resultsList.innerHTML = `<div style="padding:0.5rem; color:var(--destructive)">Ошибка: ${e.message}</div>`;
+				}
+			};
+
+			async function fetchSingle() {
+				const malId = $("malId").value;
+				const epNumInput = $("epNum");
+				const epNum = epNumInput ? epNumInput.value : AppState.currentEp;
+				const epDur = $("epDur") ? $("epDur").value : "0";
+				const types = getTypes();
+
+				if (types.length === 0) {
+					alert("Выберите типы пропуска");
+					return;
+				}
+
+				const codeOut = $("codeOutput");
+				codeOut.innerHTML = '<div style="padding:1rem; color:var(--muted-foreground)">Загрузка...</div>';
+
+				if (typeof expandSheet === "function") expandSheet();
+
+				try {
+					const data = await ApiService.getSkipTimes(malId, epNum, types, epDur);
+
+					$("gridContainer").innerHTML = "";
+					$("resultTitle").innerText = `Результат Ep ${epNum}`;
+					$("codeLabel").innerText = `Эпизод ${epNum}`;
+
+					const collapseBtn = $("collapseBtn");
+					if (collapseBtn) collapseBtn.classList.remove("visible");
+
+					const copyBtn = $("copyResultBtn");
+					if (copyBtn) copyBtn.style.visibility = "hidden";
+
+					if (data.found && data.results && data.results.length > 0) {
+						renderSkipCards(data.results, epNum);
+					} else {
+						codeOut.innerHTML = `
+							<div class="tabs">
+								<button class="tab active" type="button" data-tab="editor">Добавить</button>
+								<button class="tab" type="button" data-tab="json">JSON</button>
+							</div>
+							<div id="tabEditor" class="tab-content active"></div>
+							<div id="tabJson" class="tab-content">
+								<pre>${syntaxHighlight(data)}</pre>
+							</div>
+						`;
+						const editorTab = $("tabEditor");
+						if (editorTab) editorTab.appendChild(renderSkipEditor(epNum));
+						initSkipEditor();
+					}
+				} catch (e) {
+					codeOut.innerHTML = `<span style="color:var(--destructive)">Error: ${e.message}</span>`;
+				}
+			}
+
+			function renderSkipCards(results, epNum) {
+				const codeOut = $("codeOutput");
+
+				let html = `<div class="tabs">
+					<button class="tab active" type="button" data-tab="cards">Карточки</button>
+					<button class="tab" type="button" data-tab="json">JSON</button>
+					<button class="tab" type="button" data-tab="editor">Редактор</button>
+				</div>
+				<div id="tabCards" class="tab-content active">`;
+
+				results.forEach((skip, index) => {
+					const typeClass = skip.skipType.replace("mixed-", "");
+					const importedClass = skip._isNew ? "imported" : "";
+					const deleteBtn = skip._isNew ? `
+					<button class="skip-card-delete" type="button" data-action="delete-skip-card" data-ep="${epNum}" data-index="${index}" title="Удалить">
+						<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trash"></use></svg>
+					</button>` : "";
+					html += `
+				<div class="skip-card ${importedClass}">
+					<div class="skip-card-header">
+						<div class="skip-card-header-left">
+							<span class="skip-card-type ${typeClass}">${skip.skipType.toUpperCase()}</span>
+						</div>
+						<div class="skip-card-header-right">
+							<span class="skip-card-times">${TimeUtils.fmt(skip.interval.startTime)} → ${TimeUtils.fmt(skip.interval.endTime)}</span>
+							${deleteBtn}
+						</div>
+					</div>
+					<div class="skip-card-meta">
+						Длительность: ${TimeUtils.fmt(skip.interval.endTime - skip.interval.startTime)} •
+						Длительность эпизода: ${TimeUtils.fmt(skip.episodeLength)}
+					</div>
+					${skip._isNew ? '' : `<div class="vote-container">
+						<button class="vote-btn upvote" type="button" data-action="vote" data-vote-type="upvote" data-skip-id="${skip.skipId}">
+							<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upvote"></use></svg>
+							Полезно
+						</button>
+						<button class="vote-btn downvote" type="button" data-action="vote" data-vote-type="downvote" data-skip-id="${skip.skipId}">
+							<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-downvote"></use></svg>
+							Неточно
+						</button>
+					</div>`}
+				</div>`;
+				});
+
+				html += `</div>
+				<div id="tabJson" class="tab-content">
+					<pre>${syntaxHighlight({ found: true, results })}</pre>
+				</div>
+				<div id="tabEditor" class="tab-content"></div>`;
+
+				codeOut.innerHTML = html;
+				const editorTab = $("tabEditor");
+				if (editorTab) editorTab.appendChild(renderSkipEditor(epNum));
+				initSkipEditor();
+			}
+
+			const switchTab = (tabName, tabBtn) => {
+				document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+				document.querySelectorAll(".tab-content").forEach((t) => t.classList.remove("active"));
+
+				if (tabBtn) tabBtn.classList.add("active");
+				const content = $(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+				if (content) content.classList.add("active");
+
+				const copyBtn = $("copyResultBtn");
+				if (copyBtn) {
+					copyBtn.style.visibility = tabName === "json" ? "visible" : "hidden";
+				}
+
+				if (tabName === "editor") {
+					initSkipEditor();
+				}
+			};
+
+			const voteSkip = async (skipId, voteType, btn) => {
+				try {
+					const { res } = await ApiService.vote(skipId, voteType);
+
+					if (res.status === 429) {
+						showToast("Превышен лимит голосов", "error");
+						return;
+					}
+
+					btn.classList.add("voted");
+					btn.closest(".vote-container")
+						.querySelectorAll(".vote-btn")
+						.forEach((b) => {
+							if (b !== btn) b.style.opacity = "0.5";
+						});
+
+					showToast(voteType === "upvote" ? "Спасибо за голос!" : "Голос учтён");
+				} catch (e) {
+					showToast("Ошибка при голосовании", "error");
+				}
+			};
+
+			const renderEditorUI = (epNum) => {
+				const editorTab = $("tabEditor");
+				if (editorTab) {
+					editorTab.innerHTML = "";
+					editorTab.appendChild(renderSkipEditor(epNum));
+				}
+			};
+
+			const toggleTimeInputMode = () => {
+				let currentStart = 0;
+				let currentEnd = 0;
+				if (AppState.timelineController) {
+					currentStart = AppState.timelineController.getStartSeconds();
+					currentEnd = AppState.timelineController.getEndSeconds();
+				}
+
+				AppState.timeInputMode = AppState.timeInputMode === "min-sec" ? "seconds" : "min-sec";
+				localStorage.setItem("aniskip_time_mode", AppState.timeInputMode);
+				const editorTab = $("tabEditor");
+				if (editorTab && editorTab.classList.contains("active")) {
+					const epNumInput = $("epNum");
+					const epNum = epNumInput ? epNumInput.value : AppState.currentEp;
+					renderEditorUI(epNum);
+
+					initSkipEditor(currentStart, currentEnd);
+				}
+			};
+
+			function renderSkipEditor(epNum) {
+				const epDur = AppState.realEpisodeDuration || 1440;
+				const tpl = $("skipEditorTemplate");
+				const node = tpl.content.cloneNode(true);
+				const editor = node.querySelector(".skip-editor");
+				if (!editor) return document.createElement("div");
+
+				const epNumEl = editor.querySelector(".skip-editor-ep-num");
+				if (epNumEl) epNumEl.textContent = epNum;
+
+				const durationEl = editor.querySelector(".duration-value");
+				if (durationEl) durationEl.textContent = formatTimeDisplay(epDur);
+
+				const ticks = editor.querySelectorAll(".timeline-tick");
+				if (ticks.length >= 5) {
+					ticks[1].textContent = formatTimeDisplay(epDur * 0.25);
+					ticks[2].textContent = formatTimeDisplay(epDur * 0.5);
+					ticks[3].textContent = formatTimeDisplay(epDur * 0.75);
+					ticks[4].textContent = formatTimeDisplay(epDur);
+				}
+
+				const startAbs = editor.querySelector("#startAbsSecs");
+				const endAbs = editor.querySelector("#endAbsSecs");
+				if (startAbs) startAbs.max = epDur;
+				if (endAbs) endAbs.max = epDur;
+
+				const minFields = editor.querySelectorAll('.time-input-fields:not([mode="seconds"])');
+				const secFields = editor.querySelectorAll('.time-input-fields[mode="seconds"]');
+				minFields.forEach((el) => (el.style.display = AppState.timeInputMode === "min-sec" ? "" : "none"));
+				secFields.forEach((el) => (el.style.display = AppState.timeInputMode === "seconds" ? "" : "none"));
+
+				const toggleBtn = editor.querySelector('[data-action="toggle-time-mode"]');
+				if (toggleBtn) {
+					toggleBtn.title = AppState.timeInputMode === "min-sec" ? "Переключить на секунды" : "Переключить на минуты";
+					const labelSpan = toggleBtn.querySelector("span");
+					if (labelSpan) labelSpan.textContent = AppState.timeInputMode === "min-sec" ? "SEC" : "M:S";
+				}
+
+				editor.querySelectorAll(".skip-type-btn").forEach((b) => b.classList.remove("active"));
+				const activeBtn = editor.querySelector(`.skip-type-btn[data-type="${AppState.selectedSkipType}"]`);
+				if (activeBtn) activeBtn.classList.add("active");
+
+				const providerInput = editor.querySelector("#providerName");
+				if (providerInput) providerInput.value = getDefaultProvider();
+
+				const submitterEl = editor.querySelector(".submitter-id");
+				if (submitterEl) submitterEl.textContent = `${getSubmitterId().substring(0, 8)}...`;
+
+				return editor;
+			}
+
+			const saveManualDuration = () => {
+				let start = 0;
+				let end = 0;
+
+				if (AppState.timeInputMode === "seconds") {
+					start = parseFloat($("startAbsSecs")?.value) || 0;
+					end = parseFloat($("endAbsSecs")?.value) || 0;
+				} else {
+					start = TimeUtils.toSeconds($("startMins")?.value, $("startSecs")?.value);
+					end = TimeUtils.toSeconds($("endMins")?.value, $("endSecs")?.value);
+				}
+
+				const duration = Math.abs(end - start);
+
+				if (duration > 0) {
+					AppState.manualDurations[AppState.selectedSkipType] = duration;
+					localStorage.setItem("aniskip_manual_durations", JSON.stringify(AppState.manualDurations));
+					showToast(`Длительность ${TimeUtils.fmt(duration)} сохранена для ${AppState.selectedSkipType.toUpperCase()}`);
+				}
+			};
+
+			const resetManualDuration = () => {
+				if (AppState.manualDurations[AppState.selectedSkipType]) {
+					delete AppState.manualDurations[AppState.selectedSkipType];
+					localStorage.setItem("aniskip_manual_durations", JSON.stringify(AppState.manualDurations));
+					showToast(`Сброшена ручная длительность для ${AppState.selectedSkipType.toUpperCase()}`);
+				} else {
+					showToast("Нет сохраненной длительности", "error");
+				}
+			};
+
+			const selectSkipType = (type, btn) => {
+				AppState.selectedSkipType = type;
+				document.querySelectorAll(".skip-type-btn").forEach((b) => b.classList.remove("active"));
+				if (btn) btn.classList.add("active");
+				updateEditorSkipSelection(type);
+			};
+			const TIMELINE_SCROLL_STEP_MS = 50;
+			const TIME_INPUT_SCROLL_STEP_MS = 20;
+
+			class ScrollWheel {
+				constructor(element, onScroll) {
+					this.element = element;
+					this.onScroll = onScroll;
+					this.ridges = element.querySelector(".scroll-wheel-ridges");
+
+					this.position = 0;
+					this.velocity = 0;
+					this.lastTime = 0;
+					this.isDragging = false;
+					this.lastPos = 0;
+					this.friction = 0.95;
+					this.animating = false;
+					this.moveHistory = [];
+
+					this.isHorizontal = false;
+
+					this.boundHandlePointerMove = this.handlePointerMove.bind(this);
+					this.boundHandlePointerUp = this.handlePointerUp.bind(this);
+					this.boundHandleWheel = this.handleWheel.bind(this);
+					this.boundHandlePointerDown = this.handlePointerDown.bind(this);
+					this.animate = this.animate.bind(this);
+					this.checkOrientation = this.checkOrientation.bind(this);
+
+					this.element.addEventListener("wheel", this.boundHandleWheel, {
+						passive: false,
+					});
+					this.element.addEventListener("pointerdown", this.boundHandlePointerDown);
+					this.resizeObserver = new ResizeObserver(this.checkOrientation);
+					this.resizeObserver.observe(this.element);
+					setTimeout(this.checkOrientation, 0);
+				}
+
+				checkOrientation() {
+					if (!this.element) return;
+					const rect = this.element.getBoundingClientRect();
+					const wasHorizontal = this.isHorizontal;
+					this.isHorizontal = rect.width > rect.height;
+
+					if (wasHorizontal !== this.isHorizontal) {
+						this.element.classList.toggle("horizontal", this.isHorizontal);
+						this.updateVisuals();
+					}
+				}
+
+				handleWheel(e) {
+					e.preventDefault();
+					const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
+					const impulse = delta * 1.5;
+					this.velocity += impulse;
+					this.velocity = Math.max(-2000, Math.min(2000, this.velocity));
+
+					if (!this.animating) {
+						this.animating = true;
+						this.lastTime = performance.now();
+						requestAnimationFrame(this.animate);
+					}
+				}
+
+				handlePointerDown(e) {
+					e.preventDefault();
+					this.isDragging = true;
+					this.lastPos = this.isHorizontal ? e.clientX : e.clientY;
+					this.velocity = 0;
+					this.moveHistory = [];
+
+					this.element.setPointerCapture(e.pointerId);
+					this.element.addEventListener("pointermove", this.boundHandlePointerMove);
+					this.element.addEventListener("pointerup", this.boundHandlePointerUp);
+					this.element.addEventListener("pointercancel", this.boundHandlePointerUp);
+				}
+
+				handlePointerMove(e) {
+					if (!this.isDragging) return;
+					const currentPos = this.isHorizontal ? e.clientX : e.clientY;
+					const delta = currentPos - this.lastPos;
+					this.lastPos = currentPos;
+					const now = performance.now();
+					const move = -delta;
+					this.position += move;
+					this.onScroll(move * 5);
+					this.updateVisuals();
+					this.moveHistory.push({ time: now, delta: delta });
+					const cutoff = now - 100;
+					this.moveHistory = this.moveHistory.filter((m) => m.time > cutoff);
+				}
+
+				handlePointerUp(e) {
+					this.isDragging = false;
+					this.element.removeEventListener("pointermove", this.boundHandlePointerMove);
+					this.element.removeEventListener("pointerup", this.boundHandlePointerUp);
+					this.element.removeEventListener("pointercancel", this.boundHandlePointerUp);
+					const now = performance.now();
+					const cutoff = now - 100;
+					const recentMoves = this.moveHistory.filter((m) => m.time > cutoff);
+
+					let flingVelocity = 0;
+					if (recentMoves.length > 0) {
+						const totalDelta = recentMoves.reduce((acc, m) => acc + m.delta, 0);
+
+						flingVelocity = -(totalDelta * 15);
+					}
+
+					this.velocity = flingVelocity;
+
+					if (Math.abs(this.velocity) > 10) {
+						this.animating = true;
+						this.lastTime = performance.now();
+						requestAnimationFrame(this.animate);
+					}
+				}
+
+				animate(time) {
+					if (!this.animating) return;
+
+					const dt = Math.min((time - this.lastTime) / 1000, 0.1);
+					this.lastTime = time;
+
+					if (this.isDragging) {
+						requestAnimationFrame(this.animate);
+						return;
+					}
+					this.velocity *= Math.pow(this.friction, dt * 60);
+
+					if (Math.abs(this.velocity) < 10) {
+						this.animating = false;
+						this.velocity = 0;
+						return;
+					}
+
+					const move = this.velocity * dt;
+					this.position += move;
+					this.onScroll(move);
+					this.updateVisuals();
+
+					requestAnimationFrame(this.animate);
+				}
+
+				updateVisuals() {
+					if (this.ridges) {
+						const val = this.position % 8;
+						if (this.isHorizontal) {
+							this.ridges.style.transform = `translateX(${val}px)`;
+						} else {
+							this.ridges.style.transform = `translateY(${val}px)`;
+						}
+					}
+				}
+
+				destroy() {
+					if (!this.element) return;
+					this.animating = false;
+					this.element.removeEventListener("wheel", this.boundHandleWheel);
+					this.element.removeEventListener("pointerdown", this.boundHandlePointerDown);
+					this.element.removeEventListener("pointermove", this.boundHandlePointerMove);
+					this.element.removeEventListener("pointerup", this.boundHandlePointerUp);
+					this.element.removeEventListener("pointercancel", this.boundHandlePointerUp);
+					this.element.removeEventListener("lostpointercapture", this.boundHandlePointerUp);
+					if (this.resizeObserver) this.resizeObserver.disconnect();
+					this.element = null;
+				}
+			}
+
+			/** Контроллер таймлайна: перетаскивание и перемещение диапазона */
+			class TimelineController {
+				constructor({ track, selection, handleStart, handleEnd }, epDuration, onChange) {
+					this.track = track;
+					this.selection = selection;
+					this.handleStart = handleStart;
+					this.handleEnd = handleEnd;
+					this.epDuration = epDuration;
+					this.onChange = onChange;
+
+					let startPercent = (60 / this.epDuration) * 100;
+					if (Number.isNaN(startPercent)) startPercent = 4;
+					this.startPercent = startPercent;
+					this.endPercent = startPercent + 15;
+
+					this.activePointerId = null;
+					this.draggingType = null;
+					this.dragOffset = 0;
+
+					this.boundPointerMove = this.onPointerMove.bind(this);
+					this.boundPointerUp = this.onPointerUp.bind(this);
+					this.boundTrackClick = this.onTrackClick.bind(this);
+					this.boundStartDown = (e) => this.onPointerDown(e, "start", this.handleStart);
+					this.boundEndDown = (e) => this.onPointerDown(e, "end", this.handleEnd);
+					this.boundSelectionDown = (e) => {
+						if (e.target === this.selection) this.onPointerDown(e, "move", this.selection);
+					};
+
+					this.handleStart.addEventListener("pointerdown", this.boundStartDown);
+					this.handleEnd.addEventListener("pointerdown", this.boundEndDown);
+					this.selection.addEventListener("pointerdown", this.boundSelectionDown);
+					this.track.addEventListener("click", this.boundTrackClick);
+
+					[this.handleStart, this.handleEnd, this.selection].forEach((el) => {
+						el.style.touchAction = "none";
+					});
+
+					this.updateSelection();
+				}
+
+				getStartSeconds() {
+					return (this.startPercent / 100) * this.epDuration;
+				}
+
+				getEndSeconds() {
+					return (this.endPercent / 100) * this.epDuration;
+				}
+
+				clampPercents() {
+					this.startPercent = Math.max(0, Math.min(100, this.startPercent));
+					this.endPercent = Math.max(this.startPercent + 1, Math.min(100, this.endPercent));
+				}
+
+				updateSelection() {
+					this.selection.style.left = this.startPercent + "%";
+					this.selection.style.width = this.endPercent - this.startPercent + "%";
+					if (typeof this.onChange === "function") this.onChange();
+				}
+
+				setSeconds(startTime, endTime) {
+					this.startPercent = (startTime / this.epDuration) * 100;
+					this.endPercent = (endTime / this.epDuration) * 100;
+					this.clampPercents();
+					this.updateSelection();
+				}
+
+				shiftSeconds(deltaSec) {
+					const widthSec = this.getEndSeconds() - this.getStartSeconds();
+					let newStartSec = this.getStartSeconds() + deltaSec;
+					let newEndSec = newStartSec + widthSec;
+
+					if (newStartSec < 0) {
+						newStartSec = 0;
+						newEndSec = widthSec;
+					} else if (newEndSec > this.epDuration) {
+						newEndSec = this.epDuration;
+						newStartSec = this.epDuration - widthSec;
+					}
+
+					this.setSeconds(newStartSec, newEndSec);
+				}
+
+				adjustStart(deltaSec) {
+					let newStartSec = this.getStartSeconds() + deltaSec;
+					const endSec = this.getEndSeconds();
+					if (newStartSec < 0) newStartSec = 0;
+					if (newStartSec >= endSec) newStartSec = endSec - 0.5;
+					this.setSeconds(newStartSec, endSec);
+				}
+
+				adjustEnd(deltaSec) {
+					const startSec = this.getStartSeconds();
+					let newEndSec = this.getEndSeconds() + deltaSec;
+					if (newEndSec > this.epDuration) newEndSec = this.epDuration;
+					if (newEndSec <= startSec) newEndSec = startSec + 0.5;
+					this.setSeconds(startSec, newEndSec);
+				}
+
+				applyDuration(durationSec) {
+					const startSec = this.getStartSeconds();
+					let newEndSec = startSec + durationSec;
+
+					if (newEndSec > this.epDuration) {
+						const newStartSec = Math.max(0, this.epDuration - durationSec);
+						this.startPercent = (newStartSec / this.epDuration) * 100;
+						this.endPercent = 100;
+					} else {
+						this.endPercent = (newEndSec / this.epDuration) * 100;
+					}
+
+					this.clampPercents();
+					this.updateSelection();
+				}
+
+				onPointerDown(e, type, element) {
+					e.preventDefault();
+					this.draggingType = type;
+					this.activePointerId = e.pointerId;
+
+					if (type === "move") {
+						const rect = this.track.getBoundingClientRect();
+						const currentCursorPercent = ((e.clientX - rect.left) / rect.width) * 100;
+						this.dragOffset = currentCursorPercent - this.startPercent;
+					}
+
+					element.setPointerCapture(e.pointerId);
+					element.addEventListener("pointermove", this.boundPointerMove);
+					element.addEventListener("pointerup", this.boundPointerUp);
+					element.addEventListener("pointercancel", this.boundPointerUp);
+					element.addEventListener("lostpointercapture", this.boundPointerUp);
+				}
+
+				onPointerMove(e) {
+					if (!this.draggingType || e.pointerId !== this.activePointerId) return;
+
+					const rect = this.track.getBoundingClientRect();
+					let percent = ((e.clientX - rect.left) / rect.width) * 100;
+					percent = Math.max(0, Math.min(100, percent));
+
+					if (this.draggingType === "start") {
+						this.startPercent = Math.min(percent, this.endPercent - 2);
+					} else if (this.draggingType === "end") {
+						this.endPercent = Math.max(percent, this.startPercent + 2);
+					} else if (this.draggingType === "move") {
+						const width = this.endPercent - this.startPercent;
+						let newStart = percent - this.dragOffset;
+
+						if (newStart < 0) {
+							newStart = 0;
+						} else if (newStart + width > 100) {
+							newStart = 100 - width;
+						}
+
+						this.startPercent = newStart;
+						this.endPercent = newStart + width;
+					}
+
+					this.clampPercents();
+					this.updateSelection();
+				}
+
+				onPointerUp(e) {
+					if (e.pointerId !== this.activePointerId) return;
+
+					this.draggingType = null;
+					this.activePointerId = null;
+
+					if (e.currentTarget) {
+						e.currentTarget.removeEventListener("pointermove", this.boundPointerMove);
+						e.currentTarget.removeEventListener("pointerup", this.boundPointerUp);
+						e.currentTarget.removeEventListener("pointercancel", this.boundPointerUp);
+						e.currentTarget.removeEventListener("lostpointercapture", this.boundPointerUp);
+						if (e.currentTarget.hasPointerCapture && e.currentTarget.hasPointerCapture(e.pointerId)) {
+							e.currentTarget.releasePointerCapture(e.pointerId);
+						}
+					}
+				}
+
+				onTrackClick(e) {
+					if (e.target !== this.track) return;
+					const rect = this.track.getBoundingClientRect();
+					const percent = ((e.clientX - rect.left) / rect.width) * 100;
+					const width = this.endPercent - this.startPercent;
+
+					this.startPercent = Math.max(0, percent - width / 2);
+					this.endPercent = Math.min(100, this.startPercent + width);
+					if (this.startPercent + width > 100) {
+						this.startPercent = 100 - width;
+						this.endPercent = 100;
+					}
+
+					this.clampPercents();
+					this.updateSelection();
+				}
+
+				destroy() {
+					this.handleStart.removeEventListener("pointerdown", this.boundStartDown);
+					this.handleEnd.removeEventListener("pointerdown", this.boundEndDown);
+					this.selection.removeEventListener("pointerdown", this.boundSelectionDown);
+					this.track.removeEventListener("click", this.boundTrackClick);
+				}
+			}
+
+			const updateTimeline = () => {
+				const controller = AppState.timelineController;
+				if (!controller) return;
+				const startTime = controller.getStartSeconds();
+				const endTime = controller.getEndSeconds();
+
+				if (AppState.timeInputMode === "seconds") {
+					const s = $("startAbsSecs");
+					const e = $("endAbsSecs");
+					if (s) s.value = Math.floor(startTime);
+					if (e) e.value = Math.floor(endTime);
+				} else {
+					const sm = $("startMins");
+					const ss = $("startSecs");
+					const em = $("endMins");
+					const es = $("endSecs");
+					if (sm) sm.value = Math.floor(startTime / 60);
+					if (ss) ss.value = Math.floor(startTime % 60);
+					if (em) em.value = Math.floor(endTime / 60);
+					if (es) es.value = Math.floor(endTime % 60);
+				}
+
+				const display = $("selectionDisplay");
+				if (display) {
+					display.textContent = `${formatTimeDisplay(startTime)} → ${formatTimeDisplay(endTime)} (${formatTimeDisplay(Math.max(0, endTime - startTime))})`;
+				}
+			};
+
+			const updateFromInputs = () => {
+				const controller = AppState.timelineController;
+				if (!controller) return;
+
+				let startTime = 0;
+				let endTime = 0;
+
+				if (AppState.timeInputMode === "seconds") {
+					startTime = parseFloat($("startAbsSecs")?.value) || 0;
+					endTime = parseFloat($("endAbsSecs")?.value) || 0;
+				} else {
+					startTime = TimeUtils.toSeconds($("startMins")?.value, $("startSecs")?.value);
+					endTime = TimeUtils.toSeconds($("endMins")?.value, $("endSecs")?.value);
+				}
+
+				controller.setSeconds(startTime, endTime);
+				updateTimeline();
+			};
+
+			const bindEditorEvents = () => {
+				["startMins", "startSecs", "endMins", "endSecs", "startAbsSecs", "endAbsSecs"].forEach((id) => {
+					const el = $(id);
+					if (el) {
+						el.addEventListener("input", updateFromInputs);
+						el.addEventListener("change", updateFromInputs);
+					}
+				});
+
+				const controller = AppState.timelineController;
+				if (!controller) return;
+
+				const timelineScrollEl = $("timelineScroll");
+				if (timelineScrollEl) {
+					const wheel = new ScrollWheel(timelineScrollEl, (delta) => {
+						const changeSec = delta * (TIMELINE_SCROLL_STEP_MS / 1000);
+						controller.shiftSeconds(changeSec);
+						updateTimeline();
+					});
+					AppState.scrollWheels.push(wheel);
+				}
+
+				const startScrollEl = $("startScroll");
+				if (startScrollEl) {
+					const wheel = new ScrollWheel(startScrollEl, (delta) => {
+						const changeSec = delta * (TIME_INPUT_SCROLL_STEP_MS / 1000);
+						controller.adjustStart(changeSec);
+						updateTimeline();
+					});
+					AppState.scrollWheels.push(wheel);
+				}
+
+				const endScrollEl = $("endScroll");
+				if (endScrollEl) {
+					const wheel = new ScrollWheel(endScrollEl, (delta) => {
+						const changeSec = delta * (TIME_INPUT_SCROLL_STEP_MS / 1000);
+						controller.adjustEnd(changeSec);
+						updateTimeline();
+					});
+					AppState.scrollWheels.push(wheel);
+				}
+			};
+
+			const updateEditorSkipSelection = (type) => {
+				if (!AppState.timelineController) return;
+
+				const epNumInput = $("epNum");
+				const epNum = epNumInput ? (parseInt(epNumInput.value) || 0) : AppState.currentEp;
+				let foundImported = null;
+
+				const res = AppState.seasonResults.get(epNum);
+				if (res && res.data && res.data.results) {
+					foundImported = res.data.results.find((s) => s.skipType === type && s._isNew);
+					if (!foundImported) {
+						foundImported = res.data.results.find((s) => s.skipType === type);
+					}
+				}
+
+				if (foundImported) {
+					AppState.timelineController.setSeconds(foundImported.interval.startTime, foundImported.interval.endTime);
+				} else if (AppState.manualDurations && AppState.manualDurations[type]) {
+					AppState.timelineController.applyDuration(AppState.manualDurations[type]);
+				} else if (AppState.smartIntervals && AppState.smartIntervals[type]) {
+					AppState.timelineController.applyDuration(AppState.smartIntervals[type]);
+				}
+			};
+
+			function initSkipEditor(preserveStart, preserveEnd) {
+				AppState.epDuration = AppState.realEpisodeDuration || 1440;
+
+				const track = $("timelineTrack");
+				const selection = $("timelineSelection");
+				const handleStart = $("handleStart");
+				const handleEnd = $("handleEnd");
+
+				if (!track || !selection || !handleStart || !handleEnd) return;
+
+				if (AppState.timelineController) AppState.timelineController.destroy();
+				AppState.scrollWheels.forEach((w) => w.destroy());
+				AppState.scrollWheels = [];
+
+				AppState.timelineController = new TimelineController({ track, selection, handleStart, handleEnd }, AppState.epDuration, updateTimeline);
+
+				bindEditorEvents();
+
+				if (typeof preserveStart === 'number' && typeof preserveEnd === 'number' && preserveEnd > 0) {
+					AppState.timelineController.setSeconds(preserveStart, preserveEnd);
+				} else {
+					updateEditorSkipSelection(AppState.selectedSkipType);
+				}
+
+				updateTimeline();
+			}
+
+			async function submitSkipTime() {
+				const malId = $("malId").value;
+				const epNumInput = $("epNum");
+				const epNum = epNumInput ? epNumInput.value : AppState.currentEp;
+				const providerName = $("providerName").value || "Aniskip";
+				const submitterId = getSubmitterId();
+
+				let startTime = 0;
+				let endTime = 0;
+
+				if (AppState.timeInputMode === "seconds") {
+					startTime = parseFloat($("startAbsSecs")?.value) || 0;
+					endTime = parseFloat($("endAbsSecs")?.value) || 0;
+				} else {
+					startTime = TimeUtils.toSeconds($("startMins")?.value, $("startSecs")?.value);
+					endTime = TimeUtils.toSeconds($("endMins")?.value, $("endSecs")?.value);
+				}
+				const episodeLength = AppState.realEpisodeDuration || 1440;
+
+				if (!malId || !epNum) {
+					showToast("Укажите MAL ID и номер эпизода", "error");
+					return;
+				}
+
+				if (startTime >= endTime) {
+					showToast("Время начала должно быть меньше времени конца", "error");
+					return;
+				}
+
+				const payload = {
+					skipType: AppState.selectedSkipType,
+					providerName,
+					startTime: parseFloat(startTime.toFixed(3)),
+					endTime: parseFloat(endTime.toFixed(3)),
+					episodeLength: parseFloat(episodeLength.toFixed(3)),
+					submitterId,
+				};
+
+				try {
+					const { res, data } = await ApiService.submitSkip(malId, epNum, payload);
+
+					if (res.ok) {
+						showToast("Успешно отправлено в AniSkip!", "success");
+						$("codeOutput").innerHTML = `
+							<div style="padding:1rem; color:var(--success); border:1px solid var(--success); border-radius:var(--radius); margin-bottom:1rem; margin-top:1rem;">
+								Skip time успешно добавлен!
+							</div>
+							<pre>${syntaxHighlight(data)}</pre>
+						`;
+					} else {
+						showToast(`Ошибка: ${data.message || res.status}`, "error");
+						$("codeOutput").innerHTML = `<pre>${syntaxHighlight(data)}</pre>`;
+					}
+				} catch (e) {
+					showToast(`Ошибка сети: ${e.message}`, "error");
+				}
+			}
+
+			function toggleGridMode() {
+				const grid = $("gridContainer");
+				const btn = $("collapseBtn");
+				if (!grid || !btn) return;
+
+				const performToggle = () => {
+					const isCollapsed = grid.classList.contains("collapsed-mode");
+					if (isCollapsed) {
+						grid.classList.remove("collapsed-mode");
+						btn.innerText = "Свернуть серии";
+						localStorage.setItem("aniskip_grid_collapsed", "false");
+					} else {
+						grid.classList.add("collapsed-mode");
+						btn.innerText = "Развернуть серии";
+						localStorage.setItem("aniskip_grid_collapsed", "true");
+					}
+				};
+
+				if (document.startViewTransition) {
+					document.startViewTransition(() => performToggle());
+				} else {
+					performToggle();
+				}
+			}
+
+			function initGridState() {
+				const isCollapsed = localStorage.getItem("aniskip_grid_collapsed") === "true";
+				const btn = $("collapseBtn");
+				const grid = $("gridContainer");
+
+				if (btn) btn.innerText = isCollapsed ? "Развернуть серии" : "Свернуть серии";
+				if (grid) {
+					grid.className = "season-grid" + (isCollapsed ? " collapsed-mode" : "");
+				}
+			}
+
+			function checkCollapseVisibility() {
+				const grid = $("gridContainer");
+				const btn = $("collapseBtn");
+				if (!grid || !btn) return;
+
+				if (grid.children.length === 0) {
+					btn.classList.remove("visible");
+					return;
+				}
+
+				const style = getComputedStyle(grid);
+				const containerW = grid.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+
+				const rootStyle = getComputedStyle(document.documentElement);
+				const rem = parseFloat(rootStyle.fontSize);
+				const itemMinW = 3.25 * rem;
+				const gap = 0.5 * rem;
+
+				const maxCols = Math.floor((containerW + gap + 0.1) / (itemMinW + gap));
+
+				if (grid.children.length > maxCols) {
+					btn.classList.add("visible");
+				} else {
+					btn.classList.remove("visible");
+					if (grid.classList.contains("collapsed-mode")) {
+						grid.classList.remove("collapsed-mode");
+						btn.innerText = "Свернуть серии";
+						localStorage.setItem("aniskip_grid_collapsed", "false");
+					}
+				}
+			}
+
+			async function fetchSeason() {
+				const malId = $("malId").value;
+				const start = parseInt($("seasonStart").value, 10);
+				const end = parseInt($("seasonEnd").value, 10);
+				const epDur = $("epDur") ? $("epDur").value : "0";
+				const types = getTypes();
+
+				if (types.length === 0) {
+					alert("Выберите типы");
+					return;
+				}
+				if (end < start) return;
+
+				try {
+					const animeData = await ApiService.getAnimeById(malId);
+					if (animeData) {
+						const dur = TimeUtils.parseDuration(animeData.duration);
+						if (dur > 0) {
+							const roundedUp = Math.ceil(dur / 60) * 60 + 60;
+							AppState.jikanDuration = roundedUp;
+							AppState.realEpisodeDuration = roundedUp;
+						}
+					}
+				} catch (e) {}
+
+				$("resultTitle").innerText = `Сезон (${start} - ${end})`;
+				$("codeOutput").innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-grid"></use></svg><p>Выберите эпизод для просмотра деталей</p></div>';
+
+				if (typeof expandSheet === "function") expandSheet();
+
+				const grid = $("gridContainer");
+				const isCollapsed = localStorage.getItem("aniskip_grid_collapsed") === "true";
+				grid.className = "season-grid" + (isCollapsed ? " collapsed-mode" : "");
+				grid.innerHTML = "";
+
+				const badgeTpl = $("epBadgeTemplate");
+				const fragment = document.createDocumentFragment();
+				for (let i = start; i <= end; i++) {
+					const node = badgeTpl.content.cloneNode(true);
+					const badge = node.querySelector(".ep-badge");
+					if (!badge) continue;
+					badge.id = `badge-${i}`;
+					badge.dataset.ep = i;
+					fragment.appendChild(node);
+				}
+				grid.appendChild(fragment);
+
+				checkCollapseVisibility();
+
+				const promises = [];
+				for (let i = start; i <= end; i++) {
+					promises.push(
+						ApiService.getSkipTimes(malId, i, types, epDur)
+							.then((data) => ({ ep: i, data, found: data?.found }))
+							.catch((error) => ({ ep: i, error })),
+					);
+				}
+
+				const results = await Promise.all(promises);
+
+				AppState.smartIntervals = {};
+				AppState.seasonResults = new Map();
+				const typeDurs = {};
+				let maxEpisodeLength = 0;
+
+				results.forEach((r) => {
+					AppState.seasonResults.set(r.ep, r);
+					if (r.found && r.data && r.data.results) {
+						r.data.results.forEach((s) => {
+							const t = s.skipType.toLowerCase();
+							const d = s.interval.endTime - s.interval.startTime;
+							if (!typeDurs[t]) typeDurs[t] = [];
+							typeDurs[t].push(d);
+							if (s.episodeLength && s.episodeLength > 0 && s.episodeLength > maxEpisodeLength) {
+								maxEpisodeLength = s.episodeLength;
+							}
+						});
+					}
+				});
+
+				if (maxEpisodeLength > 0) {
+					const roundedUp = Math.ceil(maxEpisodeLength / 60) * 60 + 60;
+					AppState.realEpisodeDuration = roundedUp;
+					AppState.jikanDuration = roundedUp;
+				} else if (AppState.jikanDuration > 0 && AppState.jikanDuration !== 1440) {
+					const roundedUp = Math.ceil(AppState.jikanDuration / 60) * 60 + 60;
+					AppState.realEpisodeDuration = roundedUp;
+					AppState.jikanDuration = roundedUp;
+				}
+
+				Object.keys(typeDurs).forEach((t) => {
+					if (typeDurs[t].length >= 2) {
+						const counts = {};
+						let max = 0;
+						let mode = typeDurs[t][0];
+						typeDurs[t].forEach((d) => {
+							counts[d] = (counts[d] || 0) + 1;
+							if (counts[d] > max) {
+								max = counts[d];
+								mode = d;
+							}
+						});
+						AppState.smartIntervals[t] = mode;
+					}
+				});
+
+				results.forEach((res) => {
+					const el = document.getElementById(`badge-${res.ep}`);
+					if (!el) return;
+					el.textContent = res.ep;
+					el.className = `ep-badge ${res.found ? "found" : "missing"}`;
+				});
+			}
+
+			function copyToClipboard() {
+				const jsonTab = $("tabJson");
+				const text = jsonTab ? jsonTab.innerText : "";
+
+				navigator.clipboard.writeText(text).then(() => {
+					const btn = document.querySelector("#copyResultBtn");
+					const orig = btn.innerText.trim();
+
+					const origHtml = btn.innerHTML;
+					btn.innerText = "Скопировано!";
+					setTimeout(() => (btn.innerHTML = origHtml), 1500);
+				});
+			}
+
+			const handleImportJson = () => {
+				const input = $("importFile");
+				if (!input) return;
+
+				input.value = "";
+				input.onchange = (e) => {
+					const file = e.target.files[0];
+					if (!file) return;
+
+					const reader = new FileReader();
+					reader.onload = (ev) => {
+						try {
+							const json = JSON.parse(ev.target.result);
+							processImportData(json);
+						} catch (err) {
+							console.error(err);
+							showToast("Ошибка при чтении JSON", "error");
+						}
+					};
+					reader.readAsText(file);
+				};
+				input.click();
+			};
+
+			const processImportData = (json) => {
+				if (!json || (!json.seasons && !json.results)) {
+					showToast("Неверный формат JSON", "error");
+					return;
+				}
+
+				let episodesData = [];
+				if (json.seasons) {
+					json.seasons.forEach((s) => {
+						if (s.episodes) episodesData.push(...s.episodes);
+					});
+				} else if (Array.isArray(json.results)) {
+					episodesData = json.results;
+				}
+
+				let count = 0;
+
+				episodesData.forEach((epItem) => {
+					const epNum = epItem.episode;
+					if (epNum === undefined) return;
+
+					const hasResults = epItem.results && epItem.results.length > 0;
+					if (!epItem.found && !hasResults) return;
+
+					let existing = AppState.seasonResults.get(epNum);
+
+					if (!existing) {
+						existing = { ep: epNum, found: false, data: { found: false, results: [] } };
+					}
+
+					if (!existing.data) existing.data = { found: false, results: [] };
+					if (!existing.data.results) existing.data.results = [];
+
+					const existingTypes = new Set(existing.data.results.map((r) => r.skipType));
+
+					let modified = false;
+					if (epItem.results) {
+						epItem.results.forEach((res) => {
+							if (!existingTypes.has(res.skipType)) {
+								existing.data.results.push({
+									interval: res.interval,
+									skipType: res.skipType,
+									episodeLength: res.episodeLength || epItem.episodeLength,
+									skipId: res.skipId,
+									_isNew: true
+								});
+								existing.data.found = true;
+								existing.found = true;
+								modified = true;
+							}
+						});
+					}
+
+					if (modified) {
+						AppState.seasonResults.set(epNum, existing);
+						count++;
+
+						const badge = document.getElementById(`badge-${epNum}`);
+						if (badge) {
+							badge.className = "ep-badge imported";
+						}
+					}
+				});
+
+				showToast(`Импортировано данных для ${count} эпизодов`, "success");
+
+				const epNumInput = $("epNum");
+				const currentEp = epNumInput ? parseInt(epNumInput.value) : AppState.currentEp;
+				if (AppState.seasonResults.has(currentEp)) {
+					const badge = document.getElementById(`badge-${currentEp}`);
+					if (badge) badge.click();
+				}
+			};
+
+			const handleBulkSend = async () => {
+				const start = parseInt($("seasonStart").value, 10);
+				const end = parseInt($("seasonEnd").value, 10);
+				const malId = $("malId").value;
+				const providerName = $("providerName").value || "Aniskip";
+				const submitterId = getSubmitterId();
+
+				let episodesToSend = [];
+
+				for (let i = start; i <= end; i++) {
+					const res = AppState.seasonResults.get(i);
+					if (res && res.found && res.data && res.data.results && res.data.results.length > 0) {
+						episodesToSend.push({ ep: i, results: res.data.results });
+					}
+				}
+
+				if (episodesToSend.length === 0) {
+					showToast("Нет данных для отправки в выбранном диапазоне", "error");
+					return;
+				}
+
+				if (!confirm(`Будут отправлены данные для ${episodesToSend.length} эпизодов. Продолжить?`)) return;
+
+				$("codeOutput").innerHTML = '<div style="padding:1rem">Начинаем отправку...</div>';
+
+				let successCount = 0;
+				let failCount = 0;
+
+				for (const item of episodesToSend) {
+					for (const skip of item.results) {
+
+						if (!skip.interval || !skip._isNew) continue;
+
+						const payload = {
+							skipType: skip.skipType,
+							providerName,
+							startTime: parseFloat(skip.interval.startTime.toFixed(3)),
+							endTime: parseFloat(skip.interval.endTime.toFixed(3)),
+							episodeLength: parseFloat(skip.episodeLength.toFixed(3)),
+							submitterId,
+						};
+
+						try {
+							const { res } = await ApiService.submitSkip(malId, item.ep, payload);
+							if (res.ok) successCount++;
+							else failCount++;
+						} catch (e) {
+							failCount++;
+						}
+					}
+				}
+
+				showToast(`Отправка завершена. Успех: ${successCount}, Ошибок: ${failCount}`, failCount > 0 ? "warning" : "success");
+				$("codeOutput").innerHTML = `<div style="padding:1rem">Отправка завершена.<br>Успешно: ${successCount}<br>Ошибок: ${failCount}</div>`;
+			};
+
+			const deleteSkipCard = (epNum, index) => {
+				const res = AppState.seasonResults.get(epNum);
+				if (!res || !res.data || !res.data.results) return;
+
+				const skipToDelete = res.data.results[index];
+				if (!skipToDelete || !skipToDelete._isNew) {
+					showToast("Можно удалять только импортированные данные", "error");
+					return;
+				}
+
+				res.data.results.splice(index, 1);
+
+				if (res.data.results.length === 0) {
+					res.found = false;
+					res.data.found = false;
+					const badge = document.getElementById(`badge-${epNum}`);
+					if (badge) {
+						badge.className = "ep-badge missing";
+					}
+				} else {
+					const hasNew = res.data.results.some(r => r._isNew);
+					if (!hasNew) {
+						const badge = document.getElementById(`badge-${epNum}`);
+						if (badge) {
+							badge.classList.remove("imported");
+							badge.classList.add("found");
+						}
+					}
+				}
+
+				AppState.seasonResults.set(epNum, res);
+
+				if (res.data.results.length > 0) {
+					renderSkipCards(res.data.results, epNum);
+				} else {
+					$("codeOutput").innerHTML = `
+						<div class="tabs">
+							<button class="tab active" type="button" data-tab="editor">Добавить</button>
+							<button class="tab" type="button" data-tab="json">JSON</button>
+						</div>
+						<div id="tabEditor" class="tab-content active"></div>
+						<div id="tabJson" class="tab-content">
+							<pre>${syntaxHighlight(res.data || res.error)}</pre>
+						</div>
+					`;
+					const editorTab = $("tabEditor");
+					if (editorTab) editorTab.appendChild(renderSkipEditor(epNum));
+					initSkipEditor();
+				}
+
+				showToast("Карточка удалена", "success");
+			};
+
+			const handleDocumentClick = (e) => {
+				const actionBtn = e.target.closest("[data-action]");
+				if (actionBtn) {
+					const action = actionBtn.dataset.action;
+					switch (action) {
+						case "search-jikan":
+							searchJikan();
+							return;
+						case "save-search-settings":
+							saveSearchSettings();
+							return;
+						case "fetch-single":
+							fetchSingle();
+							return;
+						case "fetch-season":
+							fetchSeason();
+							return;
+						case "toggle-grid":
+							toggleGridMode();
+							return;
+						case "clear-log":
+							clearLog();
+							return;
+						case "copy-json":
+							copyToClipboard();
+							return;
+						case "vote": {
+							const skipId = actionBtn.dataset.skipId;
+							const voteType = actionBtn.dataset.voteType;
+							if (skipId && voteType) voteSkip(skipId, voteType, actionBtn);
+							return;
+						}
+						case "toggle-time-mode":
+							toggleTimeInputMode();
+							return;
+						case "save-manual-duration":
+							saveManualDuration();
+							return;
+						case "reset-manual-duration":
+							resetManualDuration();
+							return;
+						case "save-default-provider":
+							saveDefaultProvider();
+							return;
+						case "submit-skip":
+							submitSkipTime();
+							return;
+						case "import-json":
+							handleImportJson();
+							return;
+						case "bulk-send":
+							handleBulkSend();
+							return;
+						case "delete-skip-card": {
+							const epNum = parseInt(actionBtn.dataset.ep, 10);
+							const index = parseInt(actionBtn.dataset.index, 10);
+							if (!isNaN(epNum) && !isNaN(index)) deleteSkipCard(epNum, index);
+							return;
+						}
+						default:
+							break;
+					}
+				}
+
+				const tabBtn = e.target.closest(".tab[data-tab]");
+				if (tabBtn) {
+					switchTab(tabBtn.dataset.tab, tabBtn);
+					return;
+				}
+
+				const searchItem = e.target.closest(".search-item");
+				if (searchItem && searchItem.closest("#searchResultsList")) {
+					const malId = searchItem.dataset.malId;
+					const dur = parseInt(searchItem.dataset.duration || "0", 10) || 0;
+					const eps = parseInt(searchItem.dataset.episodes || "0", 10) || 0;
+					if (malId) $("malId").value = malId;
+					if (dur > 0) {
+						AppState.jikanDuration = dur;
+						AppState.realEpisodeDuration = dur;
+					}
+					if (eps) $("seasonEnd").value = eps;
+					$("searchResults").classList.remove("active");
+					return;
+				}
+
+				const badge = e.target.closest(".ep-badge");
+				if (badge && badge.closest("#gridContainer")) {
+					const ep = parseInt(badge.dataset.ep || badge.textContent, 10);
+					const res = AppState.seasonResults.get(ep);
+					if (!res) return;
+
+					document.querySelectorAll(".ep-badge").forEach((b) => b.classList.remove("active"));
+					badge.classList.add("active");
+
+					$("codeLabel").innerText = `Эпизод ${ep}`;
+					const epInput = $("epNum");
+					if (epInput) epInput.value = ep;
+					AppState.currentEp = ep;
+
+					const copyBtn = $("copyResultBtn");
+					if (copyBtn) copyBtn.style.visibility = "hidden";
+
+					if (res.data && res.data.results && res.data.results.length > 0) {
+						renderSkipCards(res.data.results, ep);
+					} else {
+						$("codeOutput").innerHTML = `
+								<div class="tabs">
+									<button class="tab active" type="button" data-tab="editor">Добавить</button>
+									<button class="tab" type="button" data-tab="json">JSON</button>
+								</div>
+								<div id="tabEditor" class="tab-content active"></div>
+								<div id="tabJson" class="tab-content">
+									<pre>${syntaxHighlight(res.data || res.error)}</pre>
+								</div>
+							`;
+						const editorTab = $("tabEditor");
+						if (editorTab) editorTab.appendChild(renderSkipEditor(ep));
+						initSkipEditor();
+					}
+					return;
+				}
+
+				const skipTypeBtn = e.target.closest(".skip-type-btn");
+				if (skipTypeBtn) {
+					selectSkipType(skipTypeBtn.dataset.type, skipTypeBtn);
+					return;
+				}
+
+				if (!e.target.closest(".form-group")) {
+					$("searchResults").classList.remove("active");
+				}
+			};
+
+			document.addEventListener("click", handleDocumentClick);
+
+			$("searchTerm").addEventListener("keypress", (e) => {
+				if (e.key === "Enter") searchJikan();
+			});
+
+			(function initBottomSheet() {
+				const sheet = $("mainContent");
+				const handle = $("sheetHandle");
+
+				if (!sheet || !handle) return;
+
+				const isMobile = () => window.innerWidth <= 900;
+
+				let isDragging = false;
+				let startY = 0;
+				let startHeight = 0;
+				let currentHeight = 0;
+				let lastY = 0;
+				let velocity = 0;
+				let lastTime = 0;
+
+				const COLLAPSED = 40;
+				const DEFAULT_VH = 60;
+				const EXPANDED_VH = 100;
+
+				function getViewportHeight() {
+					return window.innerHeight;
+				}
+
+				function vhToPixels(vh) {
+					return (vh / 100) * getViewportHeight();
+				}
+
+				function setSheetHeight(height) {
+					currentHeight = height;
+					document.documentElement.style.setProperty("--sheet-height", height + "px");
+				}
+
+				function snapToNearest(height, velocity) {
+					const expandedHeight = vhToPixels(EXPANDED_VH);
+
+					if (Math.abs(velocity) > 0.5) {
+						return velocity > 0 ? expandedHeight : COLLAPSED;
+					}
+
+					const midPoint = (COLLAPSED + expandedHeight) / 2;
+					return height < midPoint ? COLLAPSED : expandedHeight;
+				}
+
+				function updateSheetClass(height) {
+					const expandedHeight = vhToPixels(EXPANDED_VH);
+
+					sheet.classList.remove("expanded", "collapsed");
+
+					if (height <= COLLAPSED + 20) {
+						sheet.classList.add("collapsed");
+					} else if (height >= expandedHeight - 20) {
+						sheet.classList.add("expanded");
+					}
+				}
+
+				function onDragStart(e) {
+					if (!isMobile()) return;
+
+					isDragging = true;
+					startY = e.touches ? e.touches[0].clientY : e.clientY;
+
+					startHeight = currentHeight || COLLAPSED;
+					setSheetHeight(startHeight);
+
+					lastY = startY;
+					lastTime = Date.now();
+					velocity = 0;
+
+					sheet.classList.add("dragging");
+
+					sheet.classList.remove("collapsed", "expanded");
+
+					const sidebar = document.querySelector(".sidebar");
+					if (sidebar) sidebar.classList.add("no-transition");
+				}
+
+				function onDragMove(e) {
+					if (!isDragging || !isMobile()) return;
+
+					e.preventDefault();
+
+					const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+					const deltaY = startY - currentY;
+					const newHeight = startHeight + deltaY;
+
+					const now = Date.now();
+					const dt = now - lastTime;
+					if (dt > 0) {
+						velocity = (lastY - currentY) / dt;
+					}
+					lastY = currentY;
+					lastTime = now;
+
+					const minHeight = COLLAPSED;
+					const maxHeight = vhToPixels(100);
+					const clampedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+
+					setSheetHeight(clampedHeight);
+				}
+
+				function onDragEnd() {
+					if (!isDragging) return;
+
+					isDragging = false;
+					sheet.classList.remove("dragging");
+
+					const sidebar = document.querySelector(".sidebar");
+					if (sidebar) sidebar.classList.remove("no-transition");
+
+					const snapHeight = snapToNearest(currentHeight, velocity);
+					setSheetHeight(snapHeight);
+					updateSheetClass(snapHeight);
+				}
+
+				handle.addEventListener("touchstart", onDragStart, { passive: true });
+				document.addEventListener("touchmove", onDragMove, { passive: false });
+				document.addEventListener("touchend", onDragEnd);
+
+				handle.addEventListener("mousedown", onDragStart);
+				document.addEventListener("mousemove", (e) => {
+					if (isDragging) onDragMove(e);
+				});
+				document.addEventListener("mouseup", onDragEnd);
+
+				let lastTap = 0;
+				handle.addEventListener("touchend", (e) => {
+					const now = Date.now();
+					if (now - lastTap < 300) {
+						const expandedHeight = vhToPixels(EXPANDED_VH);
+
+						if (currentHeight >= expandedHeight - 50) {
+							setSheetHeight(COLLAPSED);
+							updateSheetClass(COLLAPSED);
+						} else {
+							setSheetHeight(expandedHeight);
+							updateSheetClass(expandedHeight);
+						}
+					}
+					lastTap = now;
+				});
+
+				expandSheet = () => {
+					if (!isMobile()) return;
+					const expandedHeight = vhToPixels(EXPANDED_VH);
+					setSheetHeight(expandedHeight);
+					updateSheetClass(expandedHeight);
+				};
+
+				collapseSheet = () => {
+					if (!isMobile()) return;
+					setSheetHeight(COLLAPSED);
+					updateSheetClass(COLLAPSED);
+				};
+
+				function initMobileSheet() {
+					if (isMobile()) {
+						setSheetHeight(COLLAPSED);
+						updateSheetClass(COLLAPSED);
+					}
+				}
+
+				window.addEventListener("resize", () => {
+					if (isMobile()) {
+						if (sheet.classList.contains("expanded")) {
+							setSheetHeight(vhToPixels(EXPANDED_VH));
+						} else {
+							setSheetHeight(COLLAPSED);
+						}
+					} else {
+						sheet.classList.remove("expanded", "collapsed", "dragging");
+					}
+				});
+
+				initMobileSheet();
+
+				if (window.visualViewport) {
+					window.visualViewport.addEventListener("resize", () => {
+						if (isMobile() && !isDragging) {
+							if (sheet.classList.contains("expanded")) {
+								setSheetHeight(vhToPixels(EXPANDED_VH));
+							}
+						}
+					});
+				}
+
+				document.addEventListener("focusout", (e) => {
+					if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+						setTimeout(() => {
+							if (isMobile()) {
+								window.scrollTo(0, 0);
+							}
+						}, 100);
+					}
+				});
+			})();
+			(function initBatchVisibility() {
+				if (!SHOW_BATCH_PROCESSING) {
+					const sep = $("batchSeparator");
+					const sec = $("batchSection");
+					if (sep) sep.style.display = "none";
+					if (sec) sec.style.display = "none";
+				}
+			})();
+			(function initDragScroll() {
+				const slider = document.getElementById("gridContainer");
+				let isDown = false;
+				let startX;
+				let scrollLeft;
+				let dragged = false;
+
+				slider.addEventListener("mousedown", (e) => {
+					if (!slider.classList.contains("collapsed-mode")) return;
+					isDown = true;
+					dragged = false;
+					startX = e.pageX - slider.offsetLeft;
+					scrollLeft = slider.scrollLeft;
+				});
+
+				slider.addEventListener("mouseleave", () => {
+					isDown = false;
+					slider.classList.remove("active");
+				});
+
+				slider.addEventListener("mouseup", () => {
+					isDown = false;
+					slider.classList.remove("active");
+				});
+
+				slider.addEventListener("mousemove", (e) => {
+					if (!isDown) return;
+					const x = e.pageX - slider.offsetLeft;
+					const walk = x - startX;
+					if (!dragged && Math.abs(walk) > 5) {
+						dragged = true;
+						slider.classList.add("active");
+					}
+
+					if (dragged) {
+						e.preventDefault();
+						slider.scrollLeft = scrollLeft - walk;
+					}
+				});
+				slider.addEventListener(
+					"wheel",
+					(e) => {
+						if (!slider.classList.contains("collapsed-mode")) return;
+						if (e.deltaY !== 0) {
+							e.preventDefault();
+							slider.scrollLeft += e.deltaY;
+						}
+					},
+					{ passive: false },
+				);
+			})();
+
+			window.addEventListener("resize", checkCollapseVisibility);
+		})();
+	</script>
+</body>
+
+</html>
