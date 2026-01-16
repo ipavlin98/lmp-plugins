@@ -1227,6 +1227,393 @@
 		return b.length - a.length;
 	});
 
+	Lampa.Lang.add({
+		huyfix_wait: {
+			ru: "Секундочку...",
+			en: "Wait a moment...",
+			uk: "Секундочку...",
+			zh: "稍等..."
+		},
+		huyfix_error_title: {
+			ru: "Вот досада...",
+			en: "What a pity...",
+			uk: "От прикрість...",
+			zh: "真遗憾..."
+		},
+		huyfix_no_files: {
+			ru: "Нет доступных файлов для воспроизведения с выбранным переводом",
+			en: "No files available for playback with selected translation",
+			uk: "Немає доступних файлів для відтворення з обраним перекладом",
+			zh: "所选翻译没有可播放的文件"
+		},
+		huyfix_want_other: {
+			ru: "Хотите выбрать другой?",
+			en: "Do you want to choose another?",
+			uk: "Хочете обрати інший?",
+			zh: "您想选择另一个吗？"
+		},
+		huyfix_choose_other: {
+			ru: "Выбрать другой",
+			en: "Choose another",
+			uk: "Обрати інший",
+			zh: "选择另一个"
+		},
+		huyfix_choose_translation: {
+			ru: "Выберите перевод",
+			en: "Choose translation",
+			uk: "Оберіть переклад",
+			zh: "选择翻译"
+		},
+		huyfix_choose_stream: {
+			ru: "Выберите поток",
+			en: "Choose stream",
+			uk: "Оберіть потік",
+			zh: "选择流"
+		},
+		huyfix_stream: {
+			ru: "Поток",
+			en: "Stream",
+			uk: "Потік",
+			zh: "流"
+		},
+		huyfix_default: {
+			ru: "По умолчанию",
+			en: "Default",
+			uk: "За замовчуванням",
+			zh: "默认"
+		},
+		huyfix_no_content: {
+			ru: "К сожалению, не удалось найти видеоконтент для этого фильма. Попробуйте выбрать другой фильм или повторите попытку позже.",
+			en: "Unfortunately, we couldn't find video content for this movie. Try selecting another movie or try again later.",
+			uk: "На жаль, не вдалося знайти відеоконтент для цього фільму. Спробуйте обрати інший фільм або повторіть спробу пізніше.",
+			zh: "很抱歉，我们找不到这部电影的视频内容。请尝试选择其他电影或稍后再试。"
+		},
+		huyfix_no_links: {
+			ru: "Не удалось найти ссылок, выберите другой перевод",
+			en: "Could not find links, choose another translation",
+			uk: "Не вдалося знайти посилань, оберіть інший переклад",
+			zh: "找不到链接，请选择其他翻译"
+		},
+		huyfix_server_address: {
+			ru: "Адрес сервера",
+			en: "Server address",
+			uk: "Адреса сервера",
+			zh: "服务器地址"
+		},
+		huyfix_add_server: {
+			ru: "Добавить сервер",
+			en: "Add server",
+			uk: "Додати сервер",
+			zh: "添加服务器"
+		},
+		huyfix_choose_server: {
+			ru: "Выбор сервера",
+			en: "Choose server",
+			uk: "Вибір сервера",
+			zh: "选择服务器"
+		},
+		huyfix_edit: {
+			ru: "Редактировать",
+			en: "Edit",
+			uk: "Редагувати",
+			zh: "编辑"
+		},
+		huyfix_delete: {
+			ru: "Удалить",
+			en: "Delete",
+			uk: "Видалити",
+			zh: "删除"
+		},
+		huyfix_server_not_specified: {
+			ru: "Сервер не указан",
+			en: "Server not specified",
+			uk: "Сервер не вказано",
+			zh: "未指定服务器"
+		},
+		huyfix_search_sources: {
+			ru: "Поиск источников...",
+			en: "Searching sources...",
+			uk: "Пошук джерел...",
+			zh: "搜索源..."
+		},
+		huyfix_access_denied: {
+			ru: "Доступ запрещён",
+			en: "Access denied",
+			uk: "Доступ заборонено",
+			zh: "访问被拒绝"
+		},
+		huyfix_sources_not_found: {
+			ru: "Источники не найдены",
+			en: "Sources not found",
+			uk: "Джерела не знайдено",
+			zh: "未找到源"
+		},
+		huyfix_connection_error: {
+			ru: "Ошибка соединения",
+			en: "Connection error",
+			uk: "Помилка з'єднання",
+			zh: "连接错误"
+		},
+		huyfix_auto_detect: {
+			ru: "Подобрать автоматически",
+			en: "Auto detect",
+			uk: "Підібрати автоматично",
+			zh: "自动检测"
+		},
+		huyfix_select_all_sources: {
+			ru: "Выбрать все источники",
+			en: "Select all sources",
+			uk: "Обрати всі джерела",
+			zh: "选择所有源"
+		},
+		huyfix_may_cause_bugs: {
+			ru: "Может вызвать баги и увеличит задержку при открытии плеера",
+			en: "May cause bugs and increase delay when opening player",
+			uk: "Може викликати баги та збільшить затримку при відкритті плеєра",
+			zh: "可能导致错误并增加播放器打开延迟"
+		},
+		huyfix_reset_default: {
+			ru: "Сбросить по умолчанию",
+			en: "Reset to default",
+			uk: "Скинути за замовчуванням",
+			zh: "重置为默认"
+		},
+		huyfix_choose_sources: {
+			ru: "Выбор источников",
+			en: "Choose sources",
+			uk: "Вибір джерел",
+			zh: "选择源"
+		},
+		huyfix_found_sources: {
+			ru: "Найдено источников",
+			en: "Found sources",
+			uk: "Знайдено джерел",
+			zh: "找到源"
+		},
+		huyfix_all_selected: {
+			ru: "Выбраны все источники",
+			en: "All sources selected",
+			uk: "Обрано всі джерела",
+			zh: "已选择所有源"
+		},
+		huyfix_sources_reset: {
+			ru: "Источники сброшены",
+			en: "Sources reset",
+			uk: "Джерела скинуто",
+			zh: "源已重置"
+		},
+		huyfix_refresh_list: {
+			ru: "Обновить список",
+			en: "Refresh list",
+			uk: "Оновити список",
+			zh: "刷新列表"
+		},
+		huyfix_public_servers: {
+			ru: "Публичные серверы",
+			en: "Public servers",
+			uk: "Публічні сервери",
+			zh: "公共服务器"
+		},
+		huyfix_already_added: {
+			ru: "Уже добавлен",
+			en: "Already added",
+			uk: "Вже додано",
+			zh: "已添加"
+		},
+		huyfix_loading: {
+			ru: "Загрузка...",
+			en: "Loading...",
+			uk: "Завантаження...",
+			zh: "加载中..."
+		},
+		huyfix_servers_not_found: {
+			ru: "Серверы не найдены",
+			en: "Servers not found",
+			uk: "Сервери не знайдено",
+			zh: "未找到服务器"
+		},
+		huyfix_checking_servers: {
+			ru: "Проверка серверов",
+			en: "Checking servers",
+			uk: "Перевірка серверів",
+			zh: "检查服务器"
+		},
+		huyfix_no_working_servers: {
+			ru: "Рабочие серверы не найдены",
+			en: "No working servers found",
+			uk: "Робочі сервери не знайдено",
+			zh: "未找到可用服务器"
+		},
+		huyfix_load_error: {
+			ru: "Ошибка загрузки",
+			en: "Loading error",
+			uk: "Помилка завантаження",
+			zh: "加载错误"
+		},
+		huyfix_online_title: {
+			ru: "Онлайн HFix",
+			en: "Online HFix",
+			uk: "Онлайн HFix",
+			zh: "在线 HFix"
+		},
+		huyfix_work_mode: {
+			ru: "Режим работы",
+			en: "Work mode",
+			uk: "Режим роботи",
+			zh: "工作模式"
+		},
+		huyfix_use_bwa: {
+			ru: "Использовать BWA",
+			en: "Use BWA",
+			uk: "Використовувати BWA",
+			zh: "使用 BWA"
+		},
+		huyfix_switch_server_bwa: {
+			ru: "Переключить между сервером и BWA",
+			en: "Switch between server and BWA",
+			uk: "Перемкнути між сервером та BWA",
+			zh: "在服务器和 BWA 之间切换"
+		},
+		huyfix_yes: {
+			ru: "Да",
+			en: "Yes",
+			uk: "Так",
+			zh: "是"
+		},
+		huyfix_no: {
+			ru: "Нет",
+			en: "No",
+			uk: "Ні",
+			zh: "否"
+		},
+		huyfix_bwa_code: {
+			ru: "BWA код",
+			en: "BWA code",
+			uk: "BWA код",
+			zh: "BWA 代码"
+		},
+		huyfix_enter_bwa_code: {
+			ru: "Введите код от bwa.to (например: abc1xyz)",
+			en: "Enter code from bwa.to (example: abc1xyz)",
+			uk: "Введіть код від bwa.to (наприклад: abc1xyz)",
+			zh: "输入来自 bwa.to 的代码（例如：abc1xyz）"
+		},
+		huyfix_not_specified: {
+			ru: "Не указан",
+			en: "Not specified",
+			uk: "Не вказано",
+			zh: "未指定"
+		},
+		huyfix_own_server: {
+			ru: "Свой сервер",
+			en: "Own server",
+			uk: "Власний сервер",
+			zh: "自己的服务器"
+		},
+		huyfix_server_example: {
+			ru: "Например: 192.168.1.1:9118",
+			en: "Example: 192.168.1.1:9118",
+			uk: "Наприклад: 192.168.1.1:9118",
+			zh: "例如：192.168.1.1:9118"
+		},
+		huyfix_sources_title: {
+			ru: "Источники",
+			en: "Sources",
+			uk: "Джерела",
+			zh: "源"
+		},
+		huyfix_choose_balancers: {
+			ru: "Выбрать балансеры для поиска",
+			en: "Choose balancers for search",
+			uk: "Обрати балансери для пошуку",
+			zh: "选择搜索平衡器"
+		},
+		huyfix_servers_list: {
+			ru: "Список серверов",
+			en: "Servers list",
+			uk: "Список серверів",
+			zh: "服务器列表"
+		},
+		huyfix_bwa_saved: {
+			ru: "BWA код сохранён",
+			en: "BWA code saved",
+			uk: "BWA код збережено",
+			zh: "BWA 代码已保存"
+		},
+		huyfix_current_server: {
+			ru: "Текущий сервер",
+			en: "Current server",
+			uk: "Поточний сервер",
+			zh: "当前服务器"
+		},
+		huyfix_token_set: {
+			ru: "Токен установлен",
+			en: "Token set",
+			uk: "Токен встановлено",
+			zh: "令牌已设置"
+		},
+		huyfix_select: {
+			ru: "Выбрать",
+			en: "Select",
+			uk: "Обрати",
+			zh: "选择"
+		},
+		huyfix_change_token: {
+			ru: "Изменить токен",
+			en: "Change token",
+			uk: "Змінити токен",
+			zh: "更改令牌"
+		},
+		huyfix_add_token: {
+			ru: "Добавить токен",
+			en: "Add token",
+			uk: "Додати токен",
+			zh: "添加令牌"
+		},
+		huyfix_delete_token: {
+			ru: "Удалить токен",
+			en: "Delete token",
+			uk: "Видалити токен",
+			zh: "删除令牌"
+		},
+		huyfix_server_token: {
+			ru: "Токен сервера",
+			en: "Server token",
+			uk: "Токен сервера",
+			zh: "服务器令牌"
+		},
+		huyfix_token_saved: {
+			ru: "Токен сохранён",
+			en: "Token saved",
+			uk: "Токен збережено",
+			zh: "令牌已保存"
+		},
+		huyfix_token_deleted: {
+			ru: "Токен удалён",
+			en: "Token deleted",
+			uk: "Токен видалено",
+			zh: "令牌已删除"
+		},
+		huyfix_online: {
+			ru: "Онлайн",
+			en: "Online",
+			uk: "Онлайн",
+			zh: "在线"
+		},
+		huyfix_server: {
+			ru: "Сервер",
+			en: "Server",
+			uk: "Сервер",
+			zh: "服务器"
+		},
+		huyfix_close: {
+			ru: "Закрыть",
+			en: "Close",
+			uk: "Закрити",
+			zh: "关闭"
+		}
+	});
+
 	var STORAGE_KEY_SERVERS = "online_servers";
 	var STORAGE_KEY_ACTIVE_SERVER = "online_active_server";
 	var STORAGE_KEY_SOURCES = "online_sources";
@@ -1588,16 +1975,16 @@
 		items.forEach(function (item) {
 			["translate", "title", "details", "name"].forEach(function (key) {
 				if (item[key]) {
-					if (item[key].indexOf("По умолчанию") === 0) {
+					if (item[key].indexOf(Lampa.Lang.translate("huyfix_default")) === 0) {
 						return;
 					}
 					if (/^\d{3,4}p$/i.test(item[key])) {
-						item[key] = "По умолчанию";
+						item[key] = Lampa.Lang.translate("huyfix_default");
 						return;
 					}
 					item[key] = regexMatch(/\(([^()]+)\)$/, 1, item[key]);
 					if (/^\d{3,4}p$/i.test(item[key])) {
-						item[key] = "По умолчанию";
+						item[key] = Lampa.Lang.translate("huyfix_default");
 						return;
 					}
 					var foundInList = false;
@@ -1632,8 +2019,8 @@
 							quality = keys.length > 0 ? keys[keys.length - 1] : "";
 						}
 						item[key] = quality
-							? "По умолчанию (" + quality + ")"
-							: "По умолчанию";
+							? Lampa.Lang.translate("huyfix_default") + " (" + quality + ")"
+							: Lampa.Lang.translate("huyfix_default");
 					}
 				}
 			});
@@ -1677,10 +2064,10 @@
 		var controllerName = Lampa.Controller.enabled().name;
 		var html = $(`<div class="connect-broken">
 						<div class="connect-broken__icon icon--nofound"></div>
-						<div class="connect-broken__title">Вот досада...</div>
-						<div class="connect-broken__text">Нет доступных файлов для воспроизведения с выбранным переводом (<b>${current.from}</b>). Хотите выбрать другой?</div>
+						<div class="connect-broken__title">${Lampa.Lang.translate("huyfix_error_title")}</div>
+						<div class="connect-broken__text">${Lampa.Lang.translate("huyfix_no_files")} (<b>${current.from}</b>). ${Lampa.Lang.translate("huyfix_want_other")}</div>
 						<div class="connect-broken__footer">
-							<div class="selector simple-button next">Выбрать другой</div>
+							<div class="selector simple-button next">${Lampa.Lang.translate("huyfix_choose_other")}</div>
 						</div>
 					</div>`);
 		html.find(".selector").on("hover:enter", function () {
@@ -1689,7 +2076,7 @@
 		});
 		html.find(".next").on("hover:enter", function () {
 			Lampa.Select.show({
-				title: "Выберите перевод",
+				title: Lampa.Lang.translate("huyfix_choose_translation"),
 				items: current.voicelist,
 				onBack: function onBack() {
 					Lampa.Controller.toggle(controllerName);
@@ -1750,7 +2137,7 @@
 		}
 
 		Lampa.Select.show({
-			title: "Выберите перевод",
+			title: Lampa.Lang.translate("huyfix_choose_translation"),
 			items: menuItems,
 			onBack: function onBack() {
 				Lampa.Controller.toggle("content");
@@ -1760,7 +2147,7 @@
 
 	function selectFlow(items, onSelectCallback) {
 		Lampa.Select.show({
-			title: "Выберите поток",
+			title: Lampa.Lang.translate("huyfix_choose_stream"),
 			items: items.map(function (item) {
 				return {
 					title:
@@ -2177,7 +2564,7 @@
 
 						function updateSearchNoty() {
 							if (!searchCompleted) {
-								Lampa.Noty.show("Секундочку...");
+								Lampa.Noty.show(Lampa.Lang.translate("huyfix_wait"));
 							}
 						}
 
@@ -2707,13 +3094,12 @@
 				key: "error",
 				value: function error(code) {
 					var controllerName = Lampa.Controller.enabled().name;
-					var text =
-						"К сожалению, не удалось найти видеоконтент для этого фильма. Попробуйте выбрать другой фильм или повторите попытку позже.";
+					var text = Lampa.Lang.translate("huyfix_no_content");
 					var html = $(`<div class="connect-broken">
-									<div class="connect-broken__title">Вот досада...</div>
+									<div class="connect-broken__title">${Lampa.Lang.translate("huyfix_error_title")}</div>
 									<div class="connect-broken__text">${text}</div>
 									<div class="connect-broken__footer">
-										<div class="selector simple-button">Закрыть</div>
+										<div class="selector simple-button">${Lampa.Lang.translate("huyfix_close")}</div>
 									</div>
 								</div>`);
 					html.find(".selector").on("hover:enter", function () {
@@ -3082,7 +3468,7 @@
 						if (typeof autoUrl === "string" && autoUrl) {
 							var flows = [
 								{
-									title: "Поток 1",
+									title: Lampa.Lang.translate("huyfix_stream") + " 1",
 									subtitle: Lampa.Utils.shortText(autoUrl, 35),
 									url: autoUrl,
 									selected: true
@@ -3109,7 +3495,8 @@
 						if (urls.length > 0) {
 							urls.forEach(function (url, index) {
 								flows.push({
-									title: "Поток " + (index + 1),
+									title:
+										Lampa.Lang.translate("huyfix_stream") + " " + (index + 1),
 									subtitle: Lampa.Utils.shortText(url, 35),
 									url: url,
 									selected: url == selectedQuality.url
@@ -3248,7 +3635,7 @@
 									.then(function (links) {
 										if (links.length == 0) {
 											return Lampa.Bell.push({
-												text: "Не удалось найти ссылок, выберите другой перевод",
+												text: Lampa.Lang.translate("huyfix_no_links"),
 												time: 5000
 											});
 										}
@@ -4005,7 +4392,7 @@
 	function openServerInput(callback) {
 		Lampa.Input.edit(
 			{
-				title: "Адрес сервера",
+				title: Lampa.Lang.translate("huyfix_server_address"),
 				value: "",
 				placeholder: "192.168.1.1:9118",
 				nosave: true,
@@ -4035,12 +4422,12 @@
 			});
 		});
 
-		items.push({ title: "Добавить сервер", add: true });
+		items.push({ title: Lampa.Lang.translate("huyfix_add_server"), add: true });
 
 		var enabled = Lampa.Controller.enabled().name;
 
 		Lampa.Select.show({
-			title: "Выбор сервера",
+			title: Lampa.Lang.translate("huyfix_choose_server"),
 			items: items,
 			onBack: function () {
 				Lampa.Controller.toggle(enabled);
@@ -4055,8 +4442,8 @@
 					Lampa.Select.show({
 						title: formatServerDisplay(servers[item.index]),
 						items: [
-							{ title: "Редактировать", edit: true },
-							{ title: "Удалить", remove: true }
+							{ title: Lampa.Lang.translate("huyfix_edit"), edit: true },
+							{ title: Lampa.Lang.translate("huyfix_delete"), remove: true }
 						],
 						onBack: function () {
 							Lampa.Controller.toggle(enabled);
@@ -4066,7 +4453,7 @@
 							if (a.edit) {
 								Lampa.Input.edit(
 									{
-										title: "Адрес сервера",
+										title: Lampa.Lang.translate("huyfix_server_address"),
 										value: servers[item.index],
 										placeholder: "192.168.1.1:9118",
 										nosave: true,
@@ -4104,7 +4491,7 @@
 			: getServerUrl();
 
 		if (!baseUrl) {
-			callback(null, "Сервер не указан");
+			callback(null, Lampa.Lang.translate("huyfix_server_not_specified"));
 			return;
 		}
 
@@ -4123,7 +4510,7 @@
 
 		function updateNoty() {
 			if (!searchDone) {
-				Lampa.Noty.show("Поиск источников...");
+				Lampa.Noty.show(Lampa.Lang.translate("huyfix_search_sources"));
 			}
 		}
 
@@ -4211,7 +4598,7 @@
 								: [];
 
 					if (json && json.accsdb) {
-						callback(null, "Доступ запрещён");
+						callback(null, Lampa.Lang.translate("huyfix_access_denied"));
 						return;
 					}
 					if (json && json.memkey) memkey = json.memkey;
@@ -4225,7 +4612,9 @@
 					if (json && json.ready) {
 						callback(
 							foundSources.length > 0 ? foundSources : null,
-							foundSources.length === 0 ? "Источники не найдены" : null
+							foundSources.length === 0
+								? Lampa.Lang.translate("huyfix_sources_not_found")
+								: null
 						);
 						return;
 					}
@@ -4239,14 +4628,16 @@
 					if (attempts >= maxAttempts) {
 						callback(
 							foundSources.length > 0 ? foundSources : null,
-							foundSources.length === 0 ? "Источники не найдены" : null
+							foundSources.length === 0
+								? Lampa.Lang.translate("huyfix_sources_not_found")
+								: null
 						);
 					} else {
 						setTimeout(poll, 1000);
 					}
 				},
 				function (error) {
-					callback(null, "Ошибка соединения");
+					callback(null, Lampa.Lang.translate("huyfix_connection_error"));
 				},
 				false,
 				{ dataType: "text" }
@@ -4262,18 +4653,18 @@
 		var items = [];
 
 		items.push({
-			title: "Подобрать автоматически",
+			title: Lampa.Lang.translate("huyfix_auto_detect"),
 			auto: true
 		});
 
 		items.push({
-			title: "Выбрать все источники",
+			title: Lampa.Lang.translate("huyfix_select_all_sources"),
 			selectAll: true,
-			subtitle: "Может вызвать баги и увеличит задержку при открытии плеера"
+			subtitle: Lampa.Lang.translate("huyfix_may_cause_bugs")
 		});
 
 		items.push({
-			title: "Сбросить по умолчанию",
+			title: Lampa.Lang.translate("huyfix_reset_default"),
 			reset: true
 		});
 
@@ -4288,7 +4679,7 @@
 		});
 
 		Lampa.Select.show({
-			title: "Выбор источников",
+			title: Lampa.Lang.translate("huyfix_choose_sources"),
 			items: items,
 			onBack: function () {
 				var newSources = items
@@ -4317,7 +4708,11 @@
 								}
 							});
 							setSelectedSources(sources);
-							Lampa.Noty.show("Найдено источников: " + sources.length);
+							Lampa.Noty.show(
+								Lampa.Lang.translate("huyfix_found_sources") +
+									": " +
+									sources.length
+							);
 							Lampa.Select.close();
 							openSourcesMenu(callback);
 						}
@@ -4333,7 +4728,12 @@
 						}
 					});
 					setSelectedSources(allSources);
-					Lampa.Noty.show("Выбраны все источники (" + allSources.length + ")");
+					Lampa.Noty.show(
+						Lampa.Lang.translate("huyfix_all_selected") +
+							" (" +
+							allSources.length +
+							")"
+					);
 					Lampa.Select.close();
 					openSourcesMenu(callback);
 					return;
@@ -4346,7 +4746,7 @@
 						}
 					});
 					setSelectedSources(defaultSources);
-					Lampa.Noty.show("Источники сброшены");
+					Lampa.Noty.show(Lampa.Lang.translate("huyfix_sources_reset"));
 					Lampa.Select.close();
 					openSourcesMenu(callback);
 					return;
@@ -4380,8 +4780,14 @@
 
 		var normalizedUserServers = userServers.map(normalizeUrl);
 
-		items.push({ title: "Обновить список", refresh: true });
-		items.push({ title: "Публичные серверы", separator: true });
+		items.push({
+			title: Lampa.Lang.translate("huyfix_refresh_list"),
+			refresh: true
+		});
+		items.push({
+			title: Lampa.Lang.translate("huyfix_public_servers"),
+			separator: true
+		});
 
 		workingServers.forEach(function (url) {
 			var normalizedUrl = normalizeUrl(url);
@@ -4389,12 +4795,16 @@
 			items.push({
 				title: formatServerDisplay(url),
 				url: url,
-				subtitle: isAdded ? "Уже добавлен" : ""
+				subtitle: isAdded ? Lampa.Lang.translate("huyfix_already_added") : ""
 			});
 		});
 
 		Lampa.Select.show({
-			title: "Публичные серверы (" + workingServers.length + ")",
+			title:
+				Lampa.Lang.translate("huyfix_public_servers") +
+				" (" +
+				workingServers.length +
+				")",
 			items: items,
 			onBack: function () {
 				Lampa.Controller.toggle(enabled);
@@ -4424,7 +4834,7 @@
 	}
 
 	function fetchAndCheckPublicServers(enabled, forceRefresh) {
-		Lampa.Noty.show("Загрузка...");
+		Lampa.Noty.show(Lampa.Lang.translate("huyfix_loading"));
 
 		var network = new Lampa.Reguest();
 		network.timeout(10000);
@@ -4432,7 +4842,7 @@
 			"https://github.io/lampac-links/working_online_lampa.json",
 			function (json) {
 				if (!Lampa.Arrays.isArray(json) || json.length === 0) {
-					Lampa.Noty.show("Серверы не найдены");
+					Lampa.Noty.show(Lampa.Lang.translate("huyfix_servers_not_found"));
 					return;
 				}
 
@@ -4442,7 +4852,7 @@
 				});
 
 				if (serversToCheck.length === 0) {
-					Lampa.Noty.show("Серверы не найдены");
+					Lampa.Noty.show(Lampa.Lang.translate("huyfix_servers_not_found"));
 					return;
 				}
 
@@ -4452,7 +4862,13 @@
 				var notyInterval;
 
 				function updateNoty() {
-					Lampa.Noty.show("Проверка серверов " + checked + "/" + total);
+					Lampa.Noty.show(
+						Lampa.Lang.translate("huyfix_checking_servers") +
+							" " +
+							checked +
+							"/" +
+							total
+					);
 				}
 
 				updateNoty();
@@ -4469,7 +4885,9 @@
 							clearInterval(notyInterval);
 
 							if (workingServers.length === 0) {
-								Lampa.Noty.show("Рабочие серверы не найдены");
+								Lampa.Noty.show(
+									Lampa.Lang.translate("huyfix_no_working_servers")
+								);
 								return;
 							}
 
@@ -4480,7 +4898,7 @@
 				});
 			},
 			function () {
-				Lampa.Noty.show("Ошибка загрузки");
+				Lampa.Noty.show(Lampa.Lang.translate("huyfix_load_error"));
 			}
 		);
 	}
@@ -4495,7 +4913,7 @@
 				) {
 					Lampa.SettingsApi.addComponent({
 						component: "online_settings",
-						name: "Онлайн HFix",
+						name: Lampa.Lang.translate("huyfix_online_title"),
 						icon: ONLINE_ICON,
 						before: "interface"
 					});
@@ -4507,24 +4925,36 @@
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_mode_title", type: "title" },
-			field: { name: "Режим работы" }
+			field: { name: Lampa.Lang.translate("huyfix_work_mode") }
 		});
 
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_use_bwa_toggle", type: "trigger", default: false },
 			field: {
-				name: "Использовать BWA",
-				description: "Переключить между сервером и BWA"
+				name: Lampa.Lang.translate("huyfix_use_bwa"),
+				description: Lampa.Lang.translate("huyfix_switch_server_bwa")
 			},
 			onChange: function (value) {
 				setUseBwa(value);
 			},
 			onRender: function (item) {
-				item.find(".settings-param__value").text(isUsingBwa() ? "Да" : "Нет");
+				item
+					.find(".settings-param__value")
+					.text(
+						isUsingBwa()
+							? Lampa.Lang.translate("huyfix_yes")
+							: Lampa.Lang.translate("huyfix_no")
+					);
 				item.on("hover:enter", function () {
 					setUseBwa(!isUsingBwa());
-					item.find(".settings-param__value").text(isUsingBwa() ? "Да" : "Нет");
+					item
+						.find(".settings-param__value")
+						.text(
+							isUsingBwa()
+								? Lampa.Lang.translate("huyfix_yes")
+								: Lampa.Lang.translate("huyfix_no")
+						);
 				});
 			}
 		});
@@ -4533,16 +4963,20 @@
 			component: "online_settings",
 			param: { name: "online_bwa_code_btn", type: "static" },
 			field: {
-				name: "BWA код",
-				description: "Введите код от bwa.to (например: abc1xyz)"
+				name: Lampa.Lang.translate("huyfix_bwa_code"),
+				description: Lampa.Lang.translate("huyfix_enter_bwa_code")
 			},
 			onRender: function (item) {
 				var code = getBwaCode();
-				item.find(".settings-param__value").text(code || "Не указан");
+				item
+					.find(".settings-param__value")
+					.text(code || Lampa.Lang.translate("huyfix_not_specified"));
 				item.on("hover:enter", function () {
 					openBwaCodeInput(function () {
 						var newCode = getBwaCode();
-						item.find(".settings-param__value").text(newCode || "Не указан");
+						item
+							.find(".settings-param__value")
+							.text(newCode || Lampa.Lang.translate("huyfix_not_specified"));
 					});
 				});
 			}
@@ -4551,15 +4985,15 @@
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_server_title", type: "title" },
-			field: { name: "Свой сервер" }
+			field: { name: Lampa.Lang.translate("huyfix_own_server") }
 		});
 
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_add_server_btn", type: "static" },
 			field: {
-				name: "Добавить сервер",
-				description: "Например: 192.168.1.1:9118"
+				name: Lampa.Lang.translate("huyfix_add_server"),
+				description: Lampa.Lang.translate("huyfix_server_example")
 			},
 			onRender: function (item) {
 				item.on("hover:enter", function () {
@@ -4587,15 +5021,15 @@
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_sources_title", type: "title" },
-			field: { name: "Источники" }
+			field: { name: Lampa.Lang.translate("huyfix_sources_title") }
 		});
 
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_sources_btn", type: "static" },
 			field: {
-				name: "Выбор источников",
-				description: "Выбрать балансеры для поиска"
+				name: Lampa.Lang.translate("huyfix_choose_sources"),
+				description: Lampa.Lang.translate("huyfix_choose_balancers")
 			},
 			onRender: function (item) {
 				item.on("hover:enter", function () {
@@ -4607,7 +5041,7 @@
 		Lampa.SettingsApi.addParam({
 			component: "online_settings",
 			param: { name: "online_servers_title", type: "title" },
-			field: { name: "Список серверов" }
+			field: { name: Lampa.Lang.translate("huyfix_servers_list") }
 		});
 
 		Lampa.Settings.listener.follow("open", function (event) {
@@ -4621,7 +5055,7 @@
 		var currentCode = getBwaCode();
 		Lampa.Input.edit(
 			{
-				title: "BWA код",
+				title: Lampa.Lang.translate("huyfix_bwa_code"),
 				value: currentCode,
 				placeholder: "abc1xyz",
 				nosave: true,
@@ -4634,7 +5068,7 @@
 					setBwaCode(new_value);
 					if (new_value) {
 						setUseBwa(true);
-						Lampa.Noty.show("BWA код сохранён");
+						Lampa.Noty.show(Lampa.Lang.translate("huyfix_bwa_saved"));
 					}
 					if (callback) callback();
 				} else {
@@ -4657,8 +5091,9 @@
 			var isActive = index === activeIndex;
 			var hasToken = !!getServerToken(server);
 			var statusParts = [];
-			if (isActive) statusParts.push("Текущий сервер");
-			if (hasToken) statusParts.push("Токен установлен");
+			if (isActive)
+				statusParts.push(Lampa.Lang.translate("huyfix_current_server"));
+			if (hasToken) statusParts.push(Lampa.Lang.translate("huyfix_token_set"));
 			var statusText = statusParts.join(" • ");
 
 			var item = $(
@@ -4687,7 +5122,9 @@
 
 		if (servers.length === 0) {
 			var emptyItem = $(
-				'<div class="settings-param online-server-item"><div class="settings-param__name" style="opacity: 0.5">Не указан</div></div>'
+				'<div class="settings-param online-server-item"><div class="settings-param__name" style="opacity: 0.5">' +
+					Lampa.Lang.translate("huyfix_not_specified") +
+					"</div></div>"
 			);
 			titleElem.after(emptyItem);
 		}
@@ -4707,17 +5144,26 @@
 		var currentToken = getServerToken(serverUrl);
 		var items = [];
 
-		if (!isActive) items.push({ title: "Выбрать", select: true });
+		if (!isActive)
+			items.push({
+				title: Lampa.Lang.translate("huyfix_select"),
+				select: true
+			});
 		if (showTokenMenu) {
 			items.push({
-				title: currentToken ? "Изменить токен" : "Добавить токен",
+				title: currentToken
+					? Lampa.Lang.translate("huyfix_change_token")
+					: Lampa.Lang.translate("huyfix_add_token"),
 				token: true
 			});
 			if (currentToken)
-				items.push({ title: "Удалить токен", removeToken: true });
+				items.push({
+					title: Lampa.Lang.translate("huyfix_delete_token"),
+					removeToken: true
+				});
 		}
-		items.push({ title: "Редактировать", edit: true });
-		items.push({ title: "Удалить", remove: true });
+		items.push({ title: Lampa.Lang.translate("huyfix_edit"), edit: true });
+		items.push({ title: Lampa.Lang.translate("huyfix_delete"), remove: true });
 
 		var enabled = Lampa.Controller.enabled().name;
 
@@ -4739,7 +5185,7 @@
 				} else if (item.token) {
 					Lampa.Input.edit(
 						{
-							title: "Токен сервера",
+							title: Lampa.Lang.translate("huyfix_server_token"),
 							value: currentToken,
 							nosave: true,
 							free: true,
@@ -4749,7 +5195,7 @@
 							if (new_value !== null) {
 								setServerToken(serverUrl, new_value.trim());
 								if (new_value.trim()) {
-									Lampa.Noty.show("Токен сохранён");
+									Lampa.Noty.show(Lampa.Lang.translate("huyfix_token_saved"));
 								}
 							}
 							if (callback) callback();
@@ -4760,7 +5206,7 @@
 					);
 				} else if (item.removeToken) {
 					setServerToken(serverUrl, "");
-					Lampa.Noty.show("Токен удалён");
+					Lampa.Noty.show(Lampa.Lang.translate("huyfix_token_deleted"));
 					if (callback) callback();
 					setTimeout(function () {
 						Lampa.Controller.toggle(enabled);
@@ -4768,7 +5214,7 @@
 				} else if (item.edit) {
 					Lampa.Input.edit(
 						{
-							title: "Адрес сервера",
+							title: Lampa.Lang.translate("huyfix_server_address"),
 							value: servers[index],
 							placeholder: "192.168.1.1:9118",
 							nosave: true,
@@ -4821,14 +5267,21 @@
 			if (e.type == "complite") {
 				var subtitle = isUsingBwa()
 					? "BWA: " +
-						(getBwaCode() ? getBwaCode().substring(0, 2) + "****" : "не указан")
-					: "Сервер: " + (formatServerDisplay(getServerUrl()) || "не указан");
+						(getBwaCode()
+							? getBwaCode().substring(0, 2) + "****"
+							: Lampa.Lang.translate("huyfix_not_specified"))
+					: Lampa.Lang.translate("huyfix_server") +
+						": " +
+						(formatServerDisplay(getServerUrl()) ||
+							Lampa.Lang.translate("huyfix_not_specified"));
 				var html =
 					'<div class="full-start__button selector view--online" data-subtitle="' +
 					subtitle +
 					'">' +
 					ONLINE_ICON +
-					"<span>Онлайн</span></div>";
+					"<span>" +
+					Lampa.Lang.translate("huyfix_online") +
+					"</span></div>";
 				var button = $(Lampa.Lang.translate(html));
 				e.object.activity.render().find(".view--torrent").after(button);
 				button.on("hover:enter", function () {
