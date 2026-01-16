@@ -52,7 +52,11 @@
 			body {
 				background-color: var(--background);
 				color: var(--foreground);
-				font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+				font-family:
+					"Inter",
+					-apple-system,
+					BlinkMacSystemFont,
+					sans-serif;
 				margin: 0;
 				padding: 0;
 				min-height: 100vh;
@@ -136,19 +140,19 @@
 			}
 
 			.filter-btn.active[data-filter="online"] {
-				border-color: rgba(34, 197, 94, 0.70);
+				border-color: rgba(34, 197, 94, 0.7);
 			}
 
 			.filter-btn.active[data-filter="ui"] {
-				border-color: rgba(129, 141, 248, 0.70);
+				border-color: rgba(129, 141, 248, 0.7);
 			}
 
 			.filter-btn.active[data-filter="player"] {
-				border-color: rgba(251, 146, 60, 0.70);
+				border-color: rgba(251, 146, 60, 0.7);
 			}
 
 			.filter-btn.active[data-filter="anime"] {
-				border-color: rgba(244, 114, 181, 0.70);
+				border-color: rgba(244, 114, 181, 0.7);
 			}
 
 			a {
@@ -197,7 +201,7 @@
 			.plugin-top {
 				display: flex;
 				align-items: center;
-				gap: 0.75rem;
+				gap: 0.5rem;
 				margin-bottom: 0.25rem;
 			}
 
@@ -327,7 +331,10 @@
 		<div class="container">
 			<header class="header">
 				<h1>Коллекция плагинов</h1>
-				<p>Telegram автора: <a href="https://t.me/ipavlin98">@ipavlin98</a></p>
+				<p>
+					Telegram автора:
+					<a href="https://t.me/ipavlin98" target="_blank">@ipavlin98</a>
+				</p>
 			</header>
 
 			<div class="filters" id="filters">
@@ -348,73 +355,85 @@
 				{
 					name: "OnlineServe",
 					file: "lmp-plugins/oooo.js",
-					description: "Берёт онлайн с лампак сервера или с BWA (по коду), ссылки можно указать в настройках.",
+					description:
+						"Берёт онлайн с лампак сервера или с BWA (по коду), ссылки можно указать в настройках.",
 					badge: "Онлайн"
 				},
 				{
 					name: "HFix",
 					file: "lmp-plugins/huyfix.js",
-					description: "То же, что и OnlineServe, но с автоматическим поиском по всем выбранным в настройках балансерам без ручного выбора при запуске.",
+					description:
+						"То же, что и OnlineServe, но с автоматическим поиском по всем выбранным в настройках балансерам без ручного выбора при запуске.",
 					badge: "Онлайн"
 				},
 				{
 					name: "Season Fix",
 					file: "lmp-plugins/season-fix.js",
-					description: "Разбивает бесконечные первые сезоны аниме на нормальные части используя базу данных TVmaze.",
+					description:
+						"Разбивает бесконечные первые сезоны аниме на нормальные части используя базу данных TVmaze.",
 					badge: "Аниме"
 				},
 				{
 					name: "Anime Skip",
 					file: "lmp-plugins/anime-skip.js",
-					description: "Пропуск опенингов и эндингов в аниме через базу Aniskip. Просмотреть или изменить информацию для конкретного аниме можно <a href='https://ipavlin98.github.io/lmp-plugins/aniskip.html' target='_blank'>здесь.</a>",
+					description:
+						"Пропуск опенингов и эндингов в аниме через базу Aniskip. Просмотреть или изменить информацию для конкретного аниме можно <a href='https://ipavlin98.github.io/lmp-plugins/aniskip.html' target='_blank'>здесь.</a>",
 					badge: "Аниме"
 				},
 				{
 					name: "Interface",
 					file: "lmp-plugins/int.js",
-					description: "Своя версия «стильного интерфейса» с множеством разных настроек.",
+					description:
+						"Моя версия «стильного интерфейса» с множеством разных настроек. Для того чтобы всё выглядело и работало правильно, необходимо после установки плагина включить маленький размер интерфейса (Настройки > Интерфейс > Размер интерфейса > Меньше).",
 					badge: "UI"
 				},
 				{
 					name: "Cardify Rating",
 					file: "lmp-plugins/cardify.js",
-					description: "Немного исправленная версия Cardify с парой фиксов и отображением рейтингов.",
+					description:
+						"Немного исправленная версия Cardify с парой фиксов и отображением рейтингов.",
 					badge: "UI"
 				},
 				{
 					name: "Logo",
 					file: "lmp-plugins/logo.js",
-					description: "Логотипы вместо названий. Плавная загрузка, кеширование, настройки разрешения.",
+					description:
+						"Логотипы вместо названий. Плавная загрузка, кеширование, настройки разрешения.",
 					badge: "UI"
 				},
 				{
 					name: "Series Progress",
 					file: "lmp-plugins/series-progress-fix.js",
-					description: "Исправленное и более аккуратное отображение прогресса просмотра сериалов и фильмов на карточках.",
+					description:
+						"Исправленное и более аккуратное отображение прогресса просмотра сериалов и фильмов на карточках.",
 					badge: "UI"
 				},
 				{
 					name: "Torrent Styles",
 					file: "lmp-plugins/torr-styles.js",
-					description: "Подсветка высоких сидов зелёным, высокого битрейта красным, зелёная рамка фокуса.",
+					description:
+						"Подсветка высоких сидов зелёным, высокого битрейта красным, зелёная рамка фокуса.",
 					badge: "UI"
 				},
 				{
 					name: "Series Skip",
 					file: "lmp-series-skip-db/series-skip.js",
-					description: "Пропуск интро и аутро для сериалов. Работает для большинства популярных тайтлов.",
+					description:
+						"Пропуск интро и аутро для сериалов. Работает для большинства популярных тайтлов.",
 					badge: "Плеер"
 				},
 				{
 					name: "PiP",
 					file: "lmp-plugins/pip.js",
-					description: "Картинка в картинке для Tizen и других систем. Дает возможно перемещаться по лампе не выходя из плеера.",
+					description:
+						"Картинка в картинке для Tizen и других систем. Дает возможно перемещаться по лампе не выходя из плеера.",
 					badge: "Плеер"
 				},
 				{
 					name: "RuTube Trailers",
 					file: "lmp-plugins/rt.js",
-					description: "Исправляет воспроизведение RuTube трейлеров на многих системах (плагин самодостаточный, если у вас уже стоит плагин для RuTube трейлеров, удалите его перед установкой моего).",
+					description:
+						"Исправляет воспроизведение RuTube трейлеров на многих системах (плагин самодостаточный, если у вас уже стоит плагин для RuTube трейлеров, удалите его перед установкой моего).",
 					badge: "Плеер"
 				}
 			];
@@ -435,21 +454,21 @@
 				const url = BASE_URL + plugin.file;
 
 				const badgeTypes = {
-					"Онлайн": "online",
-					"UI": "ui",
-					"Плеер": "player",
-					"Аниме": "anime"
+					Онлайн: "online",
+					UI: "ui",
+					Плеер: "player",
+					Аниме: "anime"
 				};
 
 				const item = document.createElement("div");
 				item.className = "plugin-item";
-				item.dataset.category = badgeTypes[plugin.badge] || 'ui';
+				item.dataset.category = badgeTypes[plugin.badge] || "ui";
 
 				item.innerHTML = `
 					<div class="plugin-info">
 						<div class="plugin-top">
 							<h3 class="plugin-name">${plugin.name}</h3>
-							<span class="plugin-badge" data-type="${badgeTypes[plugin.badge] || 'ui'}">${plugin.badge}</span>
+							<span class="plugin-badge" data-type="${badgeTypes[plugin.badge] || "ui"}">${plugin.badge}</span>
 						</div>
 						<p class="plugin-description">${plugin.description}</p>
 					</div>
@@ -472,7 +491,7 @@
 
 			function filterPlugins(category) {
 				const items = document.querySelectorAll(".plugin-item");
-				items.forEach(item => {
+				items.forEach((item) => {
 					if (category === "all" || item.dataset.category === category) {
 						item.classList.remove("hidden");
 					} else {
@@ -488,9 +507,9 @@
 				});
 
 				const filterBtns = document.querySelectorAll(".filter-btn");
-				filterBtns.forEach(btn => {
+				filterBtns.forEach((btn) => {
 					btn.addEventListener("click", () => {
-						filterBtns.forEach(b => b.classList.remove("active"));
+						filterBtns.forEach((b) => b.classList.remove("active"));
 						btn.classList.add("active");
 						filterPlugins(btn.dataset.filter);
 					});
