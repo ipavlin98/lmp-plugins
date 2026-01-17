@@ -1277,10 +1277,10 @@
 			zh: "流"
 		},
 		huyfix_default: {
-			ru: "По умолчанию",
-			en: "Default",
-			uk: "За замовчуванням",
-			zh: "默认"
+			ru: "Неизвестный перевод",
+			en: "Unknown translation",
+			uk: "Невідомий переклад",
+			zh: "未知翻译"
 		},
 		huyfix_no_content: {
 			ru: "К сожалению, не удалось найти видеоконтент для этого фильма. Попробуйте выбрать другой фильм или повторите попытку позже.",
@@ -1456,6 +1456,18 @@
 			uk: "Онлайн HFix",
 			zh: "在线 HFix"
 		},
+		huyfix_always_show_choices: {
+			ru: "Всегда выбирать озвучку и качество",
+			en: "Always select voice and quality",
+			uk: "Завжди вибирати озвучення і якість",
+			zh: "总是选择配音和质量"
+		},
+		huyfix_always_show_choices_desc: {
+			ru: "Всегда показывать выбор озвучки и потока",
+			en: "Always show voice and stream selection",
+			uk: "Завжди показувати вибір озвучення та потоку",
+			zh: "始终显示配音和流选择"
+		},
 		huyfix_work_mode: {
 			ru: "Режим работы",
 			en: "Work mode",
@@ -1621,6 +1633,7 @@
 	var STORAGE_KEY_BWA_CODE = "online_bwa_code";
 	var STORAGE_KEY_USE_BWA = "online_use_bwa";
 	var STORAGE_KEY_SERVER_TOKENS = "online_server_tokens";
+	var STORAGE_KEY_ALWAYS_SHOW_CHOICES = "online_always_show_choices";
 	var BWA_HOST = "rc.bwa.to";
 
 	var ONLINE_ICON =
@@ -1824,6 +1837,14 @@
 		Lampa.Storage.set(STORAGE_KEY_USE_BWA, use);
 	}
 
+	function isAlwaysShowChoices() {
+		return Lampa.Storage.get(STORAGE_KEY_ALWAYS_SHOW_CHOICES, false);
+	}
+
+	function setAlwaysShowChoices(show) {
+		Lampa.Storage.set(STORAGE_KEY_ALWAYS_SHOW_CHOICES, show);
+	}
+
 	function getServerTokens() {
 		var tokens = Lampa.Storage.get(STORAGE_KEY_SERVER_TOKENS, "{}");
 		if (typeof tokens === "string") {
@@ -2013,14 +2034,7 @@
 						}
 					});
 					if (!foundInList) {
-						var quality = item.maxquality || item.quality || "";
-						if (typeof quality === "object") {
-							var keys = Object.keys(quality);
-							quality = keys.length > 0 ? keys[keys.length - 1] : "";
-						}
-						item[key] = quality
-							? Lampa.Lang.translate("huyfix_default") + " (" + quality + ")"
-							: Lampa.Lang.translate("huyfix_default");
+						item[key] = Lampa.Lang.translate("huyfix_default");
 					}
 				}
 			});
@@ -2736,6 +2750,7 @@
 								})
 							);
 						});
+
 						var worker = new AsyncWorker(calls.length);
 						worker.onComplite = function () {
 							resolve(Utils.renameTranslate(plays));
@@ -2759,15 +2774,25 @@
 											}
 											playItem.quality["auto"] = playItem.url;
 										}
-										playItem.details =
-											call.details || playItem.details || "no details";
-										playItem.translate =
-											call.translate || playItem.translate || "no translate";
-										plays.push(playItem);
+
+										if (
+											playItem.quality &&
+											Object.keys(playItem.quality).length > 0
+										) {
+											playItem.details =
+												call.details || playItem.details || "no details";
+											playItem.translate =
+												call.translate || playItem.translate || "no translate";
+											playItem.source_name = call.source_name;
+											plays.push(playItem);
+										} else {
+										}
 										worker.next();
 									}
 								},
-								worker.error.bind(worker)
+								function (err) {
+									worker.error();
+								}
 							);
 						};
 						calls.forEach(function (call) {
@@ -2874,51 +2899,115 @@
 										translates = translates.concat(filtered);
 									}
 								});
-								translates.forEach(function (item) {
-									item.maxquality = item.maxquality || "1080p";
-									var match = item.translate.match(/\[(.*?)\]/);
-									if (match) {
-										match = match[1].split(",").map(function (m) {
-											return m.trim();
+								var checkStreams = function checkStreams() {
+									return new Promise(function (resolveCheck) {
+										var checkItems = translates.filter(function (t) {
+											return t.method == "call";
 										});
-										item.lang = (
-											match
-												.map(function (m) {
-													return m.toLowerCase();
-												})
-												.find(function (m) {
-													return (
-														m == "ru" ||
-														m == "uk" ||
-														m == "rus" ||
-														m == "ukr" ||
-														m == "укр"
-													);
-												}) || ""
-										).toUpperCase();
-										item.lang =
-											item.lang == "RUS"
-												? "RU"
-												: item.lang == "UKR"
-													? "UA"
-													: item.lang;
-										if (item.lang == "RU" && Utils.region() == "ru") {
-											item.lang = "";
+										if (checkItems.length == 0) {
+											resolveCheck();
+											return;
 										}
-										item.translate =
-											match.find(function (m) {
-												return m.length > 5;
-											}) || item.translate;
-									}
-								});
-								if (translates.length == 0) {
-									throw new Error("No data");
-								}
-								Utils.renameTranslate(translates);
-								resolve({
-									sources: results,
-									translates: translates
-								});
+										var worker = new AsyncWorker(checkItems.length);
+										var validItems = [];
+										worker.onComplite = function () {
+											translates = translates.filter(function (t) {
+												if (t.method == "call") {
+													return validItems.indexOf(t) !== -1;
+												}
+												return true;
+											});
+											resolveCheck();
+										};
+										checkItems.forEach(function (item) {
+											var checkUrl = function checkUrl(url, isRetry) {
+												_this6.network.timeout(
+													(item.source_name || "")
+														.toLowerCase()
+														.indexOf("mirage") !== -1
+														? 10000
+														: 5000
+												);
+												_this6.network.silent(
+													addAuthParams(url),
+													function (response) {
+														if (response.rch && isUsingBwa() && !isRetry) {
+															handleBwaRch(response, function () {
+																checkUrl(url, true);
+															});
+														} else {
+															var playItem = response;
+															if (
+																playItem &&
+																(playItem.url ||
+																	(playItem.quality &&
+																		Object.keys(playItem.quality).length > 0))
+															) {
+																validItems.push(item);
+															}
+															worker.next();
+														}
+													},
+													function () {
+														worker.next();
+													}
+												);
+											};
+											checkUrl(item.url, false);
+										});
+									});
+								};
+								checkStreams()
+									.then(function () {
+										translates.forEach(function (item) {
+											item.maxquality = item.maxquality || "1080p";
+											var match = item.translate.match(/\[(.*?)\]/);
+											if (match) {
+												match = match[1].split(",").map(function (m) {
+													return m.trim();
+												});
+												item.lang = (
+													match
+														.map(function (m) {
+															return m.toLowerCase();
+														})
+														.find(function (m) {
+															return (
+																m == "ru" ||
+																m == "uk" ||
+																m == "rus" ||
+																m == "ukr" ||
+																m == "укр"
+															);
+														}) || ""
+												).toUpperCase();
+												item.lang =
+													item.lang == "RUS"
+														? "RU"
+														: item.lang == "UKR"
+															? "UA"
+															: item.lang;
+												if (item.lang == "RU" && Utils.region() == "ru") {
+													item.lang = "";
+												}
+												item.translate =
+													match.find(function (m) {
+														return m.length > 5;
+													}) || item.translate;
+											}
+										});
+										if (translates.length == 0) {
+											throw new Error("No data");
+										}
+										Utils.renameTranslate(translates);
+										resolve({
+											sources: results,
+											translates: translates
+										});
+									})
+									.catch(function (e) {
+										reject(e);
+									});
 							})
 							.catch(reject);
 					});
@@ -3011,8 +3100,51 @@
 												rej("no data");
 												return;
 											}
-											decorateData(json, Utils.voice(item));
-											res(json.data);
+
+											var allAreCalls = json.data.every(function (d) {
+												return d.method === "call";
+											});
+
+											if (allAreCalls && json.data.length > 0) {
+												var firstCall = json.data[0];
+												_this8.network.timeout(
+													(item.source_name || "")
+														.toLowerCase()
+														.indexOf("mirage") !== -1
+														? 10000
+														: 5000
+												);
+												_this8.network.silent(
+													addAuthParams(firstCall.url),
+													function (callResponse) {
+														var callJson = callResponse;
+														if (typeof callResponse === "string") {
+															try {
+																callJson = JSON.parse(callResponse);
+															} catch (e) {
+																callJson = {};
+															}
+														}
+														if (
+															!callJson.quality ||
+															Object.keys(callJson.quality).length === 0
+														) {
+															rej("no quality in call");
+														} else {
+															decorateData(json, Utils.voice(item));
+															res(json.data);
+														}
+													},
+													function (err) {
+														rej("call network error");
+													},
+													false,
+													{ dataType: "text" }
+												);
+											} else {
+												decorateData(json, Utils.voice(item));
+												res(json.data);
+											}
 										}
 									},
 									function (err) {
@@ -3042,6 +3174,7 @@
 								})
 							);
 						});
+
 						if (!savedVoice) {
 							savedVoice = Utils.voice(allTranslates[0]);
 						}
@@ -3050,43 +3183,90 @@
 								.toLowerCase()
 								.localeCompare(Utils.voice(b).toLowerCase());
 						});
-						var neededTranslates = allTranslates.filter(function (item) {
-							return Utils.compareVoice(item.name, savedVoice);
-						});
-						var worker = new AsyncWorker(neededTranslates.length);
-						worker.onComplite = function () {
-							if (plays.length == 0) {
-								if (!allTranslates[0]) {
-									reject(700);
-									return;
-								}
-								fetchUrl(allTranslates[0], false)
-									.then(function (data) {
-										plays = plays.concat(data);
-										resolve({
-											translates: allTranslates,
-											plays: plays
-										});
-									})
-									.catch(reject);
-							} else {
-								resolve({
-									translates: allTranslates,
-									plays: plays
-								});
-							}
-						};
-						neededTranslates.forEach(function (item) {
+
+						var validatedTranslates = [];
+						var checkCount = 0;
+						var totalToCheck = allTranslates.length;
+
+						if (totalToCheck === 0) {
+							reject(700);
+							return;
+						}
+
+						allTranslates.forEach(function (item) {
 							fetchUrl(item, false)
 								.then(function (data) {
-									plays = plays.concat(data);
-									worker.next();
+									validatedTranslates.push(item);
+									checkCount++;
+									if (checkCount === totalToCheck) {
+										if (validatedTranslates.length === 0) {
+											reject(700);
+											return;
+										}
+
+										var neededTranslates = validatedTranslates.filter(
+											function (t) {
+												return Utils.compareVoice(t.name, savedVoice);
+											}
+										);
+
+										if (neededTranslates.length === 0) {
+											neededTranslates = [validatedTranslates[0]];
+										}
+
+										var worker = new AsyncWorker(neededTranslates.length);
+										worker.onComplite = function () {
+											resolve({
+												translates: validatedTranslates,
+												plays: plays
+											});
+										};
+										neededTranslates.forEach(function (t) {
+											fetchUrl(t, false)
+												.then(function (data) {
+													plays = plays.concat(data);
+													worker.next();
+												})
+												.catch(worker.error.bind(worker));
+										});
+									}
 								})
-								.catch(worker.error.bind(worker));
+								.catch(function (err) {
+									checkCount++;
+									if (checkCount === totalToCheck) {
+										if (validatedTranslates.length === 0) {
+											reject(700);
+											return;
+										}
+
+										var neededTranslates = validatedTranslates.filter(
+											function (t) {
+												return Utils.compareVoice(t.name, savedVoice);
+											}
+										);
+
+										if (neededTranslates.length === 0) {
+											neededTranslates = [validatedTranslates[0]];
+										}
+
+										var worker = new AsyncWorker(neededTranslates.length);
+										worker.onComplite = function () {
+											resolve({
+												translates: validatedTranslates,
+												plays: plays
+											});
+										};
+										neededTranslates.forEach(function (t) {
+											fetchUrl(t, false)
+												.then(function (data) {
+													plays = plays.concat(data);
+													worker.next();
+												})
+												.catch(worker.error.bind(worker));
+										});
+									}
+								});
 						});
-						if (neededTranslates.length == 0) {
-							worker.onComplite();
-						}
 					});
 				}
 			},
@@ -3512,6 +3692,9 @@
 				value: function movie(data) {
 					var _this11 = this;
 					var playerType = Utils.player();
+					var alwaysShowChoices = isAlwaysShowChoices();
+					var forceChoice = alwaysShowChoices || playerType != "inner";
+
 					data.translates.sort(function (a, b) {
 						var qA = parseInt(a.maxquality) || 0;
 						var qB = parseInt(b.maxquality) || 0;
@@ -3534,8 +3717,106 @@
 						return Utils.compareVoice(Utils.voice(t), savedVoice);
 					});
 					var hash = Lampa.Utils.hash(this.object.movie.original_title);
-					if (playerType == "inner") {
-						this.extract.links([currentTranslates]).then(function (links) {
+					if (forceChoice) {
+						var grouped = {};
+						data.translates.forEach(function (t) {
+							var voiceName = Utils.voice(t);
+							if (!grouped[voiceName]) {
+								grouped[voiceName] = [];
+							}
+							grouped[voiceName].push(t);
+						});
+
+						var voiceNames = Object.keys(grouped);
+
+						var validatedVoices = {};
+						var checkCount = 0;
+
+						voiceNames.forEach(function (voiceName) {
+							_this11.extract
+								.links([grouped[voiceName]])
+								.then(function (links) {
+									if (links.length > 0) {
+										validatedVoices[voiceName] = grouped[voiceName];
+									}
+									checkCount++;
+									if (checkCount === voiceNames.length) {
+										var validTranslates = [];
+										for (var vn in validatedVoices) {
+											validTranslates = validTranslates.concat(
+												validatedVoices[vn]
+											);
+										}
+
+										if (validTranslates.length === 0) {
+											return _this11.extract.error(700);
+										}
+
+										Utils.selectChoiceTranstale(
+											validTranslates,
+											savedVoice,
+											function (selected) {
+												_this11.voice.set(Utils.voice(selected));
+												_this11.extract
+													.links([
+														validTranslates.filter(function (t) {
+															return Utils.compareVoice(
+																Utils.voice(t),
+																Utils.voice(selected)
+															);
+														})
+													])
+													.then(function (links) {
+														if (links.length == 0) {
+															return Lampa.Bell.push({
+																text: Lampa.Lang.translate("huyfix_no_links"),
+																time: 5000
+															});
+														}
+														var quality = _this11.getQuality(links);
+														var subtitleItem = links.find(function (i) {
+															return i.subtitles;
+														});
+														var flows = _this11.extract.flows(quality);
+														Utils.selectChoiceFlow(flows, function (flow) {
+															var playData = {
+																title:
+																	_this11.object.movie.title ||
+																	_this11.object.movie.name,
+																url: flow.url,
+																timeline: Lampa.Timeline.view(hash),
+																subtitles: subtitleItem
+																	? subtitleItem.subtitles
+																	: false
+															};
+															Lampa.Player.play(playData);
+														});
+													})
+													.catch(function (e) {
+														_this11.extract.error(e);
+													});
+											}
+										);
+									}
+								})
+								.catch(function (err) {
+									checkCount++;
+									if (checkCount === voiceNames.length) {
+										var validTranslates = [];
+										for (var vn in validatedVoices) {
+											validTranslates = validTranslates.concat(
+												validatedVoices[vn]
+											);
+										}
+
+										if (validTranslates.length === 0) {
+											return _this11.extract.error(700);
+										}
+									}
+								});
+						});
+					} else if (playerType == "inner") {
+						_this11.extract.links([currentTranslates]).then(function (links) {
 							preprocessLinksWithM3u8(links, function (processedLinks) {
 								if (Lampa.Player.opened()) {
 									Lampa.Player.close();
@@ -3545,6 +3826,39 @@
 								var subtitleItem = processedLinks.find(function (i) {
 									return i.subtitles;
 								});
+
+								var sourcesWithLinks = {};
+								processedLinks.forEach(function (link) {
+									var translateName =
+										link.translate_name || link.translate || "";
+									var srcName = link.source_name || "";
+									if (translateName && srcName) {
+										if (!sourcesWithLinks[translateName]) {
+											sourcesWithLinks[translateName] = [];
+										}
+										if (
+											sourcesWithLinks[translateName].indexOf(srcName) === -1
+										) {
+											sourcesWithLinks[translateName].push(srcName);
+										}
+									}
+								});
+
+								var translatesWithSources = {};
+								currentTranslates.forEach(function (item) {
+									var voiceName = item.translate;
+									var srcName = item.source_name || "";
+									if (!translatesWithSources[voiceName]) {
+										translatesWithSources[voiceName] = [];
+									}
+									if (
+										srcName &&
+										translatesWithSources[voiceName].indexOf(srcName) === -1
+									) {
+										translatesWithSources[voiceName].push(srcName);
+									}
+								});
+
 								var grouped = {};
 								data.translates.forEach(function (item) {
 									var voiceName = item.translate;
@@ -3556,10 +3870,23 @@
 										};
 									}
 									var srcName = item.source_name || "";
+									var shouldAdd = false;
 									if (
 										srcName &&
 										grouped[voiceName].sources.indexOf(srcName) === -1
 									) {
+										if (Utils.compareVoice(voiceName, savedVoice)) {
+											if (
+												sourcesWithLinks[voiceName] &&
+												sourcesWithLinks[voiceName].indexOf(srcName) !== -1
+											) {
+												shouldAdd = true;
+											}
+										} else {
+											shouldAdd = true;
+										}
+									}
+									if (shouldAdd) {
 										grouped[voiceName].sources.push(srcName);
 									}
 									var itemQuality = parseInt(item.maxquality) || 0;
@@ -3617,50 +3944,6 @@
 								_this11.setFlowsForQuality(playData);
 							});
 						});
-					} else {
-						Utils.selectChoiceTranstale(
-							data.translates,
-							savedVoice,
-							function (selected) {
-								_this11.voice.set(Utils.voice(selected));
-								_this11.extract
-									.links([
-										data.translates.filter(function (t) {
-											return Utils.compareVoice(
-												Utils.voice(t),
-												Utils.voice(selected)
-											);
-										})
-									])
-									.then(function (links) {
-										if (links.length == 0) {
-											return Lampa.Bell.push({
-												text: Lampa.Lang.translate("huyfix_no_links"),
-												time: 5000
-											});
-										}
-										var quality = _this11.getQuality(links);
-										var subtitleItem = links.find(function (i) {
-											return i.subtitles;
-										});
-										var flows = _this11.extract.flows(quality);
-										Utils.selectChoiceFlow(flows, function (flow) {
-											var playData = {
-												title:
-													_this11.object.movie.title ||
-													_this11.object.movie.name,
-												url: flow.url,
-												timeline: Lampa.Timeline.view(hash),
-												subtitles: subtitleItem ? subtitleItem.subtitles : false
-											};
-											Lampa.Player.play(playData);
-										});
-									})
-									.catch(function (e) {
-										_this11.extract.error(e);
-									});
-							}
-						);
 					}
 				}
 			},
@@ -3737,44 +4020,9 @@
 								launch_player: "inner",
 								url: function url(callback) {
 									var playerType = Utils.player();
-									if (playerType == "inner") {
-										Lampa.Player.loading(true);
-										_this12.extract
-											.links([
-												data.plays.filter(function (p) {
-													return p.e == episode.number;
-												})
-											])
-											.then(function (links) {
-												if (links.length == 0) {
-													playlistItem.url = "nofound";
-													callback();
-												} else {
-													playlistItem.quality = _this12.getQuality(links);
-													playlistItem.url = Lampa.Player.getUrlQuality(
-														playlistItem.quality
-													);
-													callback();
-													setTimeout(function () {
-														_this12.setFlowsForQuality({
-															url:
-																typeof playlistItem.url === "string"
-																	? playlistItem.url
-																	: "",
-															quality: playlistItem.quality,
-															quality_switched: null
-														});
-													}, 100);
-												}
-											})
-											.catch(function () {
-												playlistItem.url = "nofound";
-												callback();
-											})
-											.finally(function () {
-												Lampa.Player.loading(false);
-											});
-									} else {
+									var alwaysShowChoices = isAlwaysShowChoices();
+									var forceChoice = alwaysShowChoices || playerType != "inner";
+									if (forceChoice) {
 										Utils.selectChoiceTranstale(
 											data.translates,
 											Utils.voice(
@@ -3820,6 +4068,43 @@
 													});
 											}
 										);
+									} else if (playerType == "inner") {
+										Lampa.Player.loading(true);
+										_this12.extract
+											.links([
+												data.plays.filter(function (p) {
+													return p.e == episode.number;
+												})
+											])
+											.then(function (links) {
+												if (links.length == 0) {
+													playlistItem.url = "nofound";
+													callback();
+												} else {
+													playlistItem.quality = _this12.getQuality(links);
+													playlistItem.url = Lampa.Player.getUrlQuality(
+														playlistItem.quality
+													);
+													callback();
+													setTimeout(function () {
+														_this12.setFlowsForQuality({
+															url:
+																typeof playlistItem.url === "string"
+																	? playlistItem.url
+																	: "",
+															quality: playlistItem.quality,
+															quality_switched: null
+														});
+													}, 100);
+												}
+											})
+											.catch(function () {
+												playlistItem.url = "nofound";
+												callback();
+											})
+											.finally(function () {
+												Lampa.Player.loading(false);
+											});
 									}
 								},
 								card: _this12.object.movie,
@@ -4926,6 +5211,41 @@
 			component: "online_settings",
 			param: { name: "online_mode_title", type: "title" },
 			field: { name: Lampa.Lang.translate("huyfix_work_mode") }
+		});
+
+		Lampa.SettingsApi.addParam({
+			component: "online_settings",
+			param: {
+				name: "online_always_show_choices_toggle",
+				type: "trigger",
+				default: false
+			},
+			field: {
+				name: Lampa.Lang.translate("huyfix_always_show_choices"),
+				description: Lampa.Lang.translate("huyfix_always_show_choices_desc")
+			},
+			onChange: function (value) {
+				setAlwaysShowChoices(value);
+			},
+			onRender: function (item) {
+				item
+					.find(".settings-param__value")
+					.text(
+						isAlwaysShowChoices()
+							? Lampa.Lang.translate("huyfix_yes")
+							: Lampa.Lang.translate("huyfix_no")
+					);
+				item.on("hover:enter", function () {
+					setAlwaysShowChoices(!isAlwaysShowChoices());
+					item
+						.find(".settings-param__value")
+						.text(
+							isAlwaysShowChoices()
+								? Lampa.Lang.translate("huyfix_yes")
+								: Lampa.Lang.translate("huyfix_no")
+						);
+				});
+			}
 		});
 
 		Lampa.SettingsApi.addParam({
