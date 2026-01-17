@@ -29,7 +29,6 @@
 
 			* {
 				box-sizing: border-box;
-				/* -webkit-tap-highlight-color: transparent; */
 			}
 
 			html {
@@ -110,6 +109,7 @@
 				letter-spacing: 0.05em;
 				cursor: pointer;
 				transition: all 0.2s ease;
+				touch-action: manipulation;
 			}
 
 			.filter-btn[data-filter="all"] {
@@ -278,6 +278,7 @@
 				outline: none;
 				cursor: text;
 				width: 100%;
+				touch-action: manipulation;
 			}
 
 			.copy-btn {
@@ -291,6 +292,7 @@
 				border-radius: 4px;
 				cursor: pointer;
 				transition: all 0.2s ease;
+				touch-action: manipulation;
 			}
 
 			.copy-btn:hover {
