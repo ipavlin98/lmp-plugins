@@ -11,13 +11,14 @@
 
 	var globalInfoCache = {};
 
+	blockShortsPlugin();
+
 	addStyles();
 	initializeSettings();
 
 	siStyleSetupVoteColorsObserver();
 	siStyleSetupVoteColorsForDetailPage();
 	setupPreloadObserver();
-	// setupHideShotsLine();
 
 	var mainMaker = Lampa.Maker.map("Main");
 	if (!mainMaker || !mainMaker.Items || !mainMaker.Create) return;
@@ -891,52 +892,6 @@
 			subtree: true
 		});
 	}
-
-	// function setupHideShotsLine() {
-	// 	Lampa.Listener.follow("line", function (e) {
-	// 		var isShots = e.data && e.data.title === "Shots";
-
-	// 		if (
-	// 			e.type === "create" &&
-	// 			isShots &&
-	// 			Lampa.Storage.get("hide_shots_line", false)
-	// 		) {
-	// 			var lineObj = e.line;
-	// 			if (lineObj) {
-	// 				if (lineObj.html) {
-	// 					var htmlEl =
-	// 						lineObj.html instanceof jQuery ? lineObj.html[0] : lineObj.html;
-	// 					if (htmlEl) {
-	// 						htmlEl.style.display = "none";
-	// 						setTimeout(function () {
-	// 							if (htmlEl.parentNode) {
-	// 								htmlEl.parentNode.removeChild(htmlEl);
-	// 							}
-	// 						}, 10);
-	// 					}
-	// 				}
-
-	// 				setTimeout(function () {
-	// 					var activity = Lampa.Activity.active();
-	// 					var component =
-	// 						activity && activity.activity && activity.activity.component;
-	// 					var items = component && component.items;
-
-	// 					if (items && Array.isArray(items)) {
-	// 						var idx = items.indexOf(lineObj);
-	// 						if (idx !== -1) {
-	// 							items.splice(idx, 1);
-	// 						}
-	// 					}
-
-	// 					if (typeof lineObj.destroy === "function") {
-	// 						lineObj.destroy();
-	// 					}
-	// 				}, 50);
-	// 			}
-	// 		}
-	// 	});
-	// }
 
 	function InfoPanel() {
 		this.html = null;
@@ -1873,17 +1828,17 @@
 			}
 		});
 
-		// Lampa.SettingsApi.addParam({
-		// 	component: "style_interface",
-		// 	param: { name: "hide_shots_line", type: "trigger", default: false },
-		// 	field: {
-		// 		name: "Скрывать ленту Shots",
-		// 		description: "Лампа будет перезагружена"
-		// 	},
-		// 	onChange: function () {
-		// 		window.location.reload();
-		// 	}
-		// });
+		Lampa.SettingsApi.addParam({
+			component: "style_interface",
+			param: { name: "disable_shorts_plugin", type: "trigger", default: false },
+			field: {
+				name: "Отключить Shorts",
+				description: "Блокирует загрузку плагина Shorts"
+			},
+			onChange: function () {
+				window.location.reload();
+			}
+		});
 
 		Lampa.SettingsApi.addParam({
 			component: "style_interface",
@@ -1921,5 +1876,81 @@
 				});
 			}
 		});
+	}
+
+	function blockShortsPlugin() {
+		if (Lampa.Storage.get("disable_shorts_plugin", false)) {
+			var patterns = ["plugin/shots", "plugin/shorts"];
+
+			var isBlocked = function (url) {
+				for (var i = 0; i < patterns.length; i++) {
+					if (url.indexOf(patterns[i]) !== -1) return true;
+				}
+				return false;
+			};
+
+			var originalPutScript = Lampa.Utils.putScript;
+			Lampa.Utils.putScript = function (url, callback, error_callback, sync) {
+				if (typeof url === "string") {
+					if (isBlocked(url)) {
+						if (callback) callback();
+						return;
+					}
+				} else if (Array.isArray(url)) {
+					var newUrl = url.filter(function (u) {
+						return !isBlocked(u);
+					});
+					if (newUrl.length === 0) {
+						if (callback) callback();
+						return;
+					}
+					if (newUrl.length !== url.length) {
+						return originalPutScript.call(
+							this,
+							newUrl,
+							callback,
+							error_callback,
+							sync
+						);
+					}
+				}
+				return originalPutScript.apply(this, arguments);
+			};
+
+			var originalPutScriptAsync = Lampa.Utils.putScriptAsync;
+			Lampa.Utils.putScriptAsync = function (
+				url,
+				callback,
+				error_callback,
+				success_callback,
+				show_logs
+			) {
+				if (typeof url === "string") {
+					if (isBlocked(url)) {
+						if (callback) callback();
+						return;
+					}
+				} else if (Array.isArray(url)) {
+					var newUrl = url.filter(function (u) {
+						return !isBlocked(u);
+					});
+					if (newUrl.length === 0) {
+						if (callback) callback();
+						return;
+					}
+					if (newUrl.length !== url.length) {
+						return originalPutScriptAsync.call(
+							this,
+							newUrl,
+							callback,
+							error_callback,
+							success_callback,
+							show_logs
+						);
+					}
+				}
+				return originalPutScriptAsync.apply(this, arguments);
+			};
+		}
 	}
 })();
