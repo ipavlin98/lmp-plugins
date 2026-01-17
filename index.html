@@ -63,7 +63,7 @@
 				font-size: 0.875rem;
 				line-height: 1.5;
 				-webkit-font-smoothing: antialiased;
-				touch-action: pan-y;
+				touch-action: manipulation;
 			}
 
 			.container {
@@ -356,6 +356,10 @@
 		</div>
 
 		<script>
+			document.addEventListener('dblclick', (e) => {
+				e.preventDefault();
+			}, { passive: false });
+
 			const BASE_URL = "https://ipavlin98.github.io/";
 
 			const plugins = [
