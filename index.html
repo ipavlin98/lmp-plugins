@@ -29,7 +29,7 @@
 
 			* {
 				box-sizing: border-box;
-				-webkit-tap-highlight-color: transparent;
+				/* -webkit-tap-highlight-color: transparent; */
 			}
 
 			html {
@@ -184,15 +184,17 @@
 				flex-direction: column;
 				align-items: flex-start;
 				gap: 1rem;
+			}
+
+			/*
+			.plugin-item:hover {
+				background: #050505;
 				transition: background 0.2s ease;
 			}
+			*/
 
 			.plugin-item.hidden {
 				display: none;
-			}
-
-			.plugin-item:hover {
-				background: #050505;
 			}
 
 			.plugin-info {
@@ -490,7 +492,10 @@
 				copyBtn.addEventListener("click", () => copyToClipboard(url, copyBtn));
 
 				const urlInput = item.querySelector(".plugin-url");
-				urlInput.addEventListener("focus", (e) => e.target.select());
+				urlInput.addEventListener("click", (e) => {
+					e.target.select();
+					e.target.setSelectionRange(0, e.target.value.length);
+				});
 
 				return item;
 			}
