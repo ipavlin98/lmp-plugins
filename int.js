@@ -17,7 +17,7 @@
 	siStyleSetupVoteColorsObserver();
 	siStyleSetupVoteColorsForDetailPage();
 	setupPreloadObserver();
-	setupHideShotsLine();
+	// setupHideShotsLine();
 
 	var mainMaker = Lampa.Maker.map("Main");
 	if (!mainMaker || !mainMaker.Items || !mainMaker.Create) return;
@@ -892,51 +892,51 @@
 		});
 	}
 
-	function setupHideShotsLine() {
-		Lampa.Listener.follow("line", function (e) {
-			var isShots = e.data && e.data.title === "Shots";
+	// function setupHideShotsLine() {
+	// 	Lampa.Listener.follow("line", function (e) {
+	// 		var isShots = e.data && e.data.title === "Shots";
 
-			if (
-				e.type === "create" &&
-				isShots &&
-				Lampa.Storage.get("hide_shots_line", false)
-			) {
-				var lineObj = e.line;
-				if (lineObj) {
-					if (lineObj.html) {
-						var htmlEl =
-							lineObj.html instanceof jQuery ? lineObj.html[0] : lineObj.html;
-						if (htmlEl) {
-							htmlEl.style.display = "none";
-							setTimeout(function () {
-								if (htmlEl.parentNode) {
-									htmlEl.parentNode.removeChild(htmlEl);
-								}
-							}, 10);
-						}
-					}
+	// 		if (
+	// 			e.type === "create" &&
+	// 			isShots &&
+	// 			Lampa.Storage.get("hide_shots_line", false)
+	// 		) {
+	// 			var lineObj = e.line;
+	// 			if (lineObj) {
+	// 				if (lineObj.html) {
+	// 					var htmlEl =
+	// 						lineObj.html instanceof jQuery ? lineObj.html[0] : lineObj.html;
+	// 					if (htmlEl) {
+	// 						htmlEl.style.display = "none";
+	// 						setTimeout(function () {
+	// 							if (htmlEl.parentNode) {
+	// 								htmlEl.parentNode.removeChild(htmlEl);
+	// 							}
+	// 						}, 10);
+	// 					}
+	// 				}
 
-					setTimeout(function () {
-						var activity = Lampa.Activity.active();
-						var component =
-							activity && activity.activity && activity.activity.component;
-						var items = component && component.items;
+	// 				setTimeout(function () {
+	// 					var activity = Lampa.Activity.active();
+	// 					var component =
+	// 						activity && activity.activity && activity.activity.component;
+	// 					var items = component && component.items;
 
-						if (items && Array.isArray(items)) {
-							var idx = items.indexOf(lineObj);
-							if (idx !== -1) {
-								items.splice(idx, 1);
-							}
-						}
+	// 					if (items && Array.isArray(items)) {
+	// 						var idx = items.indexOf(lineObj);
+	// 						if (idx !== -1) {
+	// 							items.splice(idx, 1);
+	// 						}
+	// 					}
 
-						if (typeof lineObj.destroy === "function") {
-							lineObj.destroy();
-						}
-					}, 50);
-				}
-			}
-		});
-	}
+	// 					if (typeof lineObj.destroy === "function") {
+	// 						lineObj.destroy();
+	// 					}
+	// 				}, 50);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
 	function InfoPanel() {
 		this.html = null;
@@ -1873,17 +1873,17 @@
 			}
 		});
 
-		Lampa.SettingsApi.addParam({
-			component: "style_interface",
-			param: { name: "hide_shots_line", type: "trigger", default: false },
-			field: {
-				name: "Скрывать ленту Shots",
-				description: "Лампа будет перезагружена"
-			},
-			onChange: function () {
-				window.location.reload();
-			}
-		});
+		// Lampa.SettingsApi.addParam({
+		// 	component: "style_interface",
+		// 	param: { name: "hide_shots_line", type: "trigger", default: false },
+		// 	field: {
+		// 		name: "Скрывать ленту Shots",
+		// 		description: "Лампа будет перезагружена"
+		// 	},
+		// 	onChange: function () {
+		// 		window.location.reload();
+		// 	}
+		// });
 
 		Lampa.SettingsApi.addParam({
 			component: "style_interface",
