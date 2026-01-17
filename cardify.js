@@ -991,6 +991,10 @@
 						render.find(".full-start__status").hide();
 					}
 
+					if (!Main.cases()[Main.stor()].field("cardify_show_rating")) {
+						render.find(".full-start-new__rate-line.rate-fix").hide();
+					}
+
 					this.loadOriginalPoster(e, render);
 
 					if (
@@ -1187,6 +1191,17 @@
 			},
 			field: {
 				name: "Показывать статус"
+			}
+		});
+		Lampa.SettingsApi.addParam({
+			component: "cardify",
+			param: {
+				name: "cardify_show_rating",
+				type: "trigger",
+				default: true
+			},
+			field: {
+				name: "Показывать рейтинг"
 			}
 		});
 
