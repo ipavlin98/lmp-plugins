@@ -318,9 +318,50 @@
 				color: var(--success);
 			}
 
+			.footer {
+				margin-top: 4rem;
+				padding-top: 2rem;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				color: var(--muted-foreground);
+				font-size: 0.75rem;
+			}
+
+			.support-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				color: var(--foreground);
+				border: 1px solid var(--border);
+				padding: 0.4rem 0.8rem;
+				border-radius: 4px;
+				text-decoration: none;
+				font-weight: 500;
+				transition: all 0.2s ease;
+			}
+
+			.support-link:hover {
+				background: var(--input);
+				border-color: var(--muted-foreground);
+			}
+
+			.support-link svg {
+				width: 14px;
+				height: 14px;
+				fill: #ef4444;
+			}
+
 			@media (max-width: 800px) {
 				.container {
 					padding: 2rem 1.5rem;
+				}
+
+				.footer {
+					flex-direction: column;
+					gap: 1.5rem;
+					align-items: flex-start;
 				}
 
 				.plugin-item {
@@ -353,6 +394,22 @@
 			</div>
 
 			<div class="plugins-list" id="pluginsList"></div>
+
+			<footer class="footer">
+				<div class="footer-left">
+					Сделано с любовью для сообщества Lampa.
+				</div>
+				<div class="footer-right">
+					<a href="https://www.donationalerts.com/r/ipavlin98" target="_blank" class="support-link">
+						<svg viewBox="0 0 24 24">
+							<path
+								d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+							/>
+						</svg>
+						Поддержать автора
+					</a>
+				</div>
+			</footer>
 		</div>
 
 		<script>
