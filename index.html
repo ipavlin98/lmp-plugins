@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta
 			name="viewport"
-			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover"
 		/>
 		<title>Lampa Plugins</title>
 
@@ -63,6 +63,7 @@
 				font-size: 0.875rem;
 				line-height: 1.5;
 				-webkit-font-smoothing: antialiased;
+				touch-action: pan-y;
 			}
 
 			.container {
@@ -262,7 +263,7 @@
 				background: var(--input);
 				border: 1px solid var(--border);
 				border-radius: 4px;
-				padding: 0.4rem 0.75rem;
+				padding: 0 0.75rem;
 				height: 2rem;
 				font-family: "JetBrains Mono", monospace;
 				font-size: 0.6875rem;
@@ -271,8 +272,9 @@
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
-				user-select: all;
+				outline: none;
 				cursor: text;
+				width: 100%;
 			}
 
 			.copy-btn {
@@ -473,7 +475,7 @@
 						<p class="plugin-description">${plugin.description}</p>
 					</div>
 					<div class="plugin-actions">
-						<div class="plugin-url">${url}</div>
+						<input type="text" class="plugin-url" value="${url}" readonly />
 						<button class="copy-btn" title="Копировать ссылку">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -485,6 +487,9 @@
 
 				const copyBtn = item.querySelector(".copy-btn");
 				copyBtn.addEventListener("click", () => copyToClipboard(url, copyBtn));
+
+				const urlInput = item.querySelector(".plugin-url");
+				urlInput.addEventListener("focus", (e) => e.target.select());
 
 				return item;
 			}
