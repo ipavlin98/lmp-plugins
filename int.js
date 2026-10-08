@@ -484,6 +484,11 @@
 	function getStyles() {
 		var wide = Lampa.Storage.get("wide_post") !== false;
 		return `<style>
+			.si-rating-outlined {
+				border: 1px solid transparent;
+				border-width: 1px !important;
+				border-style: solid !important;
+			}
 			.items-line {
 				padding-bottom: ${wide ? 4 : 3.2}em !important;
 			}
@@ -1324,56 +1329,43 @@
 
 	function siStyleApplyColorByRating(element) {
 		var $el = $(element);
-		var voteText = $el.text().trim();
+		var group = $el.closest(ratingGroupSelector + ", .full-start__rate, .full-start-new__rate");
+		if (!group.children("div").length) group = $();
+		var number = group.length ? group.children("div").first() : $el;
+		var voteText = number.text().trim();
 		var colored = Lampa.Storage.get("si_colored_ratings", true);
 
-		if (colored && /^\d+(\.\d+)?K$/.test(voteText)) return;
+		if (colored && /^\d+([.,]\d+)?K$/.test(voteText)) return;
 
-		var match = voteText.match(/(\d+(\.\d+)?)/);
-		var vote = match ? parseFloat(match[0]) : NaN;
-		var color = siStyleGetColorByRating(vote);
+		var match = voteText.match(/(\d+([.,]\d+)?)/);
+		var vote = match ? parseFloat(match[0].replace(",", ".")) : NaN;
+		var color = colored ? siStyleGetColorByRating(vote) : "";
 
-		if (color && colored) {
-			$el.css("color", color);
-
-			if (
-				Lampa.Storage.get("si_rating_border", false) &&
-				!$el.hasClass("card__vote")
-			) {
-				if ($el.parent().hasClass("full-start__rate")) {
-					$el.parent().css("border", "1px solid " + color);
-					$el.css("border", "");
-				} else if (
-					$el.hasClass("full-start__rate") ||
-					$el.hasClass("full-start-new__rate") ||
-					$el.hasClass("info__rate")
-				) {
-					$el.css("border", "1px solid " + color);
-				} else {
-					$el.css("border", "");
-				}
-			} else {
-				$el.css("border", "");
-				if ($el.parent().hasClass("full-start__rate")) {
-					$el.parent().css("border", "");
-				}
+		if (group.length) {
+			var labels = group.children(".rating-plugin-label");
+			if (!labels.length && group.children("div").length > 1) {
+				labels = group.children("div").last().not(".rating-plugin-reaction");
 			}
+			group.css("color", "");
+			number.css({ color: color, border: "" });
+			labels.css("color", color);
+		} else number.css("color", color);
+
+		var borderTarget = group.length ? group : $el.filter(".full-start__rate, .full-start-new__rate, .info__rate");
+		var outlined = colored && Lampa.Storage.get("si_rating_border", false);
+		if (borderTarget.length) {
+			borderTarget.toggleClass("si-rating-outlined", !!outlined)
+				.css("border", outlined ? "1px solid " + (color || "transparent") : "");
 		} else {
-			$el.css("color", "");
-			$el.css("border", "");
-			if ($el.parent().hasClass("full-start__rate")) {
-				$el.parent().css("border", "");
-			}
+			$el.removeClass("si-rating-outlined").css("border", "");
 		}
 	}
 
 	function siStyleUpdateVoteColors(root) {
 		var scope = $(root || document.body);
-		scope.find(ratingSelector).add(scope.filter(ratingSelector)).each(function () {
+		var selectors = ratingSelector + ", " + ratingGroupSelector;
+		scope.find(selectors).add(scope.filter(selectors)).each(function () {
 			siStyleApplyColorByRating(this);
-		});
-		scope.find(ratingGroupSelector).add(scope.filter(ratingGroupSelector)).each(function () {
-			siStyleApplyColorByRating($(this).children("div").first());
 		});
 	}
 
@@ -1381,8 +1373,6 @@
 		siStyleUpdateVoteColors();
 
 		var observer = new MutationObserver(function (mutations) {
-			if (!Lampa.Storage.get("si_colored_ratings", true)) return;
-
 			var roots = new Set();
 			for (var i = 0; i < mutations.length; i++) {
 				var mutation = mutations[i];
@@ -1413,10 +1403,19 @@
 	function siStyleSetupVoteColorsForDetailPage() {
 		if (!window.Lampa || !Lampa.Listener) return;
 
+		Lampa.Listener.follow("rating:updated", function (event) {
+			if (event.render) siStyleUpdateVoteColors(event.render);
+		});
+
 		Lampa.Listener.follow("full", function (data) {
-			if (data.type === "complite") {
-				siStyleUpdateVoteColors();
+			if (data.type === "complite" || (data.type === "build" && data.name === "start")) {
+				var render = data.item && typeof data.item.render === "function" ? data.item.render() : data.body;
+				siStyleUpdateVoteColors(render);
 			}
+		});
+
+		if (Lampa.Storage.listener) Lampa.Storage.listener.follow("change", function (event) {
+			if (event.name === "si_colored_ratings" || event.name === "si_rating_border") siStyleUpdateVoteColors();
 		});
 
 		Lampa.Listener.follow("activity", function (e) {
