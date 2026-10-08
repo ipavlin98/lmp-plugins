@@ -21,8 +21,53 @@
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
 			rel="stylesheet"
 		/>
+		<script>
+			(() => {
+				const root = document.documentElement;
+				root.classList.add("is-loading");
+				const reveal = () =>
+					requestAnimationFrame(() =>
+						requestAnimationFrame(() => root.classList.remove("is-loading"))
+					);
+				const fonts = document.fonts
+					? Promise.all(
+							[
+								"400 1em Inter",
+								"500 1em Inter",
+								"600 1em Inter",
+								"400 1em 'JetBrains Mono'",
+								"500 1em 'JetBrains Mono'"
+							].map((font) => document.fonts.load(font))
+						)
+					: Promise.resolve();
+				const ready = new Promise((resolve) => {
+					if (document.readyState !== "loading") resolve();
+					else document.addEventListener("DOMContentLoaded", resolve, { once: true });
+				});
+				Promise.race([
+					Promise.all([fonts, ready]),
+					new Promise((resolve) => setTimeout(resolve, 1500))
+				])
+					.catch(() => {})
+					.then(reveal);
+			})();
+		</script>
 
 		<style>
+			html.is-loading body {
+				opacity: 0;
+			}
+
+			html.is-loading *,
+			html.is-loading *::before,
+			html.is-loading *::after {
+				transition: none !important;
+			}
+
+			body {
+				transition: opacity 0.25s ease;
+			}
+
 			:root {
 				--background: #09090b;
 				--background-secondary: #0c0c0f;
