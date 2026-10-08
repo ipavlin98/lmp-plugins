@@ -1,9 +1,8 @@
 (function () {
 	"use strict";
 	function injectStyles() {
-		if (document.getElementById("ep-design-css")) return;
 		var css = `
-			.card .card-watched { display: none !important; }
+			.card.ep-design-active .card-watched { display: none !important; }
 			.ep-watched-layer {
 				position: absolute;
 				left: 0.4em;
@@ -19,14 +18,13 @@
 				display: flex;
 				flex-direction: column;
 				pointer-events: none;
-				overflow: hidden;
 				opacity: 0;
 				transition: opacity 0.2s ease;
 			}
-			.card.focus .ep-watched-layer,
-			.card:hover .ep-watched-layer {
+			.card.focus .ep-watched-layer.ep-ready,
+			.card:hover .ep-watched-layer.ep-ready {
 				opacity: 1;
-				transition-delay: 0.4s;
+				transition-delay: 0.3s;
 			}
 			.ep-watched-body {
 				font-size: 0.9em;
@@ -70,10 +68,10 @@
 				font-weight: 600;
 			}
 		`;
-		var style = document.createElement("style");
+		var style = document.getElementById("ep-design-css") || document.createElement("style");
 		style.id = "ep-design-css";
 		style.innerHTML = css;
-		document.head.appendChild(style);
+		if (!style.parentNode) document.head.appendChild(style);
 	}
 	function getDaysFromNow(dateStr) {
 		if (!dateStr) return -1;
@@ -113,216 +111,141 @@
 		return variations.concat(extraVariations);
 	}
 	function getSeriesProgress(card) {
-		var Utils = Lampa.Utils;
-		var Storage = Lampa.Storage;
-		var Timeline = Lampa.Timeline;
-		var baseKeys = [card.original_title, card.original_name, card.name].filter(Boolean);
+		var baseKeys = [card.original_name, card.original_title, card.name, card.title].filter(Boolean);
 		var keys = [];
 		baseKeys.forEach(function (key) {
-			var vars = generateVariations(key);
-			vars.forEach(function (v) {
+			generateVariations(key).forEach(function (v) {
 				if (keys.indexOf(v) === -1) keys.push(v);
 			});
 		});
-		var cache = Storage.get("online_watched_last", "{}");
+		var cache = Lampa.Storage.get("online_watched_last", "{}") || {};
 		var found = null;
-		var foundKey = null;
 		keys.some(function (key) {
-			var hash = Utils.hash(key);
-			if (cache[hash]) {
-				found = cache[hash];
-				foundKey = key;
+			var item = cache[Lampa.Utils.hash(key)];
+			if (item && item.episode > 0 && item.season >= 0) {
+				found = { season: item.season, episode: item.episode, title: key };
 				return true;
 			}
 		});
-		if (!found && card.id) {
-			var allKeys = Object.keys(cache);
-			allKeys.some(function (hash) {
-				var item = cache[hash];
-				if (item && item.id == card.id) {
-					found = item;
-					foundKey = item.title || item.name || item.original_title || item.original_name;
-					return true;
-				}
-			});
-		}
-		if (found) {
-			return {
-				season: found.season,
-				episode: found.episode,
-				title: foundKey || baseKeys[0],
-				fromHistory: true,
-			};
-		}
-		if (baseKeys[0]) {
-			var hashS1E1 = Utils.hash([1, 1, baseKeys[0]].join(""));
-			var view = Timeline.view(hashS1E1);
-			if (view && view.percent > 0) {
-				return { season: 1, episode: 1, title: baseKeys[0], fromHistory: false };
-			}
-		}
-		return null;
+		if (found) return found;
+		keys.some(function (key) {
+			var watched = Lampa.Timeline.watched({ original_name: key }, true);
+			var last = Array.isArray(watched) && watched[watched.length - 1];
+			if (!last) return false;
+			found = { season: 1, episode: last.ep, title: key };
+			return true;
+		});
+		return found;
 	}
 	function loadEpisodes(card, season, callback) {
-		if (!Lampa.Api || !Lampa.Api.seasons) return callback([]);
-		Lampa.Api.seasons(
-			card,
-			[season],
-			function (data) {
-				if (data && data[season] && data[season].episodes) {
-					callback(data[season].episodes);
-				} else {
-					callback([]);
-				}
-			},
-			function () {
-				callback([]);
-			},
-		);
+		try {
+			Lampa.Api.seasons(card, [season], function (data) {
+				callback(data && data[season] && Array.isArray(data[season].episodes) ? data[season].episodes : []);
+			});
+		} catch (e) {
+			callback([]);
+		}
 	}
-	function drawHTML(cardNode, items, isMovieMode) {
+	function escapeHtml(text) {
+		return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	}
+	function episodeTitle(number, name) {
+		return '<span class="ep-num">' + escapeHtml(number) + " -</span> " + escapeHtml(name);
+	}
+	function drawHTML(cardNode, items) {
 		var viewContainer = cardNode.querySelector(".card__view");
 		if (!viewContainer) return;
-		var layer = cardNode.querySelector(".ep-watched-layer");
-		if (!items || !items.length) {
+		var layer = viewContainer.querySelector(".ep-watched-layer");
+		cardNode.classList.toggle("ep-design-active", items.length > 0);
+		if (!items.length) {
 			if (layer) layer.remove();
 			return;
 		}
-		if (!layer) {
+		var html = items
+			.map(function (data) {
+				var line = data.percent > 0 ? '<div class="ep-time-line"><div style="width: ' + data.percent + '%"></div></div>' : "";
+				return '<div class="ep-watched-item' + (data.isCurrent ? " is-active" : "") + '"><span>' + data.title + "</span>" + line + "</div>";
+			})
+			.join("");
+		if (layer && layer.epHtml === html) return;
+		var isNew = !layer;
+		if (isNew) {
 			layer = document.createElement("div");
 			layer.className = "ep-watched-layer";
+		}
+		layer.innerHTML = '<div class="ep-watched-body">' + html + "</div>";
+		layer.epHtml = html;
+		if (isNew) {
 			viewContainer.appendChild(layer);
+			void window.getComputedStyle(layer).opacity;
+			layer.classList.add("ep-ready");
 		}
-		if (isMovieMode) layer.classList.add("layer--movie");
-		else layer.classList.remove("layer--movie");
-		var body = layer.querySelector(".ep-watched-body");
-		if (!body) {
-			body = document.createElement("div");
-			body.className = "ep-watched-body";
-			layer.appendChild(body);
-		} else {
-			body.innerHTML = "";
-		}
-		items.forEach(function (data) {
-			var item = document.createElement("div");
-			item.className = "ep-watched-item" + (data.isMovie ? " movie-variant" : "");
-			if (data.isCurrent) {
-				item.classList.add("is-active");
-			}
-			var spanText = document.createElement("span");
-			spanText.innerHTML = data.title;
-			item.appendChild(spanText);
-			if (data.percent > 0) {
-				var timeline = document.createElement("div");
-				timeline.className = "ep-time-line";
-				var bar = document.createElement("div");
-				bar.style.width = data.percent + "%";
-				timeline.appendChild(bar);
-				item.appendChild(timeline);
-			}
-			body.appendChild(item);
-		});
 	}
 	function processSeries(cardNode, cardData) {
 		var progress = getSeriesProgress(cardData);
-		if (!progress) return;
+		if (!progress) return drawHTML(cardNode, []);
+		var titleKey = progress.title;
+		function percentOf(season, episode) {
+			var view = Lampa.Timeline.view(Lampa.Utils.hash([season, season > 10 ? ":" : "", episode, titleKey].join("")));
+			return (view && view.percent) || 0;
+		}
+		var fallback = [
+			{
+				title: episodeTitle(progress.episode, Lampa.Lang.translate("full_episode") + " " + progress.episode),
+				percent: percentOf(progress.season, progress.episode),
+				isCurrent: true,
+			},
+		];
+		cardNode.classList.add("ep-design-active");
+		var request = cardNode.epDesignRequest;
 		loadEpisodes(cardData, progress.season, function (episodes) {
-			if (!episodes.length) return;
-			var titleKey = progress.title || cardData.original_title || cardData.original_name || cardData.name;
-			var lastWatchedIndex = -1;
-			episodes.forEach(function (ep, index) {
-				var hashStr = [ep.season_number, ep.season_number > 10 ? ":" : "", ep.episode_number, titleKey].join("");
-				var view = Lampa.Timeline.view(Lampa.Utils.hash(hashStr));
-				if (view && view.percent > 0) {
-					lastWatchedIndex = index;
-				}
+			if (request !== cardNode.epDesignRequest) return;
+			var currentIndex = episodes.findIndex(function (ep) {
+				return ep.episode_number == progress.episode;
 			});
-			var currentIndex = 0;
-			if (lastWatchedIndex > -1) {
-				currentIndex = lastWatchedIndex;
-			} else {
-				var indexInHistory = episodes.findIndex(function (ep) {
-					return ep.episode_number == progress.episode;
-				});
-				if (indexInHistory > -1) {
-					currentIndex = indexInHistory;
-				}
-			}
-			var nextEpIndex = currentIndex + 1;
-			var nextEp = episodes[nextEpIndex];
-			var daysToNext = nextEp ? getDaysFromNow(nextEp.air_date) : -1;
-			var nextIsFuture = daysToNext > 0;
-			var listToShow = [];
-			if (nextIsFuture) {
-				listToShow.push(episodes[currentIndex]);
-				if (nextEp) listToShow.push(nextEp);
-			} else {
-				listToShow = episodes.slice(currentIndex, currentIndex + 5);
-			}
+			if (currentIndex === -1) return drawHTML(cardNode, fallback);
+			episodes.forEach(function (ep, index) {
+				if (index > currentIndex && percentOf(ep.season_number, ep.episode_number) > 0) currentIndex = index;
+			});
+			var nextEp = episodes[currentIndex + 1];
+			var listToShow = nextEp && getDaysFromNow(nextEp.air_date) > 0 ? [episodes[currentIndex], nextEp] : episodes.slice(currentIndex, currentIndex + 5);
 			var itemsToDraw = listToShow.map(function (ep, i) {
-				var isFirstInList = i === 0;
-				var percent = 0;
 				var days = getDaysFromNow(ep.air_date);
 				var isFuture = days > 0;
 				var epName = (ep.name || "").replace(new RegExp("^" + ep.episode_number + "([ .-]|$)"), "").trim();
-				if (!epName || epName === Lampa.Lang.translate("noname")) epName = "";
+				if (epName === Lampa.Lang.translate("noname")) epName = "";
 				if (isFuture) {
-					if (days >= 365) {
-						var years = Math.floor(days / 365);
-						epName = "Осталось лет: " + years;
-					} else if (days >= 30) {
-						var months = Math.floor(days / 30);
-						epName = "Осталось месяцев: " + months;
-					} else if (days >= 7) {
-						var weeks = Math.floor(days / 7);
-						epName = "Осталось недель: " + weeks;
-					} else {
-						epName = "Осталось дней: " + days;
-					}
-				}
-				var titleHtml = '<span class="ep-num">' + ep.episode_number + " -</span> " + epName;
-				if (!isFuture) {
-					var hashStr = [ep.season_number, ep.season_number > 10 ? ":" : "", ep.episode_number, titleKey].join("");
-					var viewData = Lampa.Timeline.view(Lampa.Utils.hash(hashStr));
-					if (viewData) percent = viewData.percent;
+					if (days >= 365) epName = "Осталось лет: " + Math.floor(days / 365);
+					else if (days >= 30) epName = "Осталось месяцев: " + Math.floor(days / 30);
+					else if (days >= 7) epName = "Осталось недель: " + Math.floor(days / 7);
+					else epName = "Осталось дней: " + days;
 				}
 				return {
-					title: titleHtml,
-					percent: percent,
-					isCurrent: isFirstInList,
-					isMovie: false,
+					title: episodeTitle(ep.episode_number, epName),
+					percent: isFuture ? 0 : percentOf(ep.season_number, ep.episode_number),
+					isCurrent: i === 0,
 				};
 			});
-			drawHTML(cardNode, itemsToDraw, false);
+			drawHTML(cardNode, itemsToDraw);
 		});
 	}
 	function processMovie(cardNode, cardData) {
-		var Utils = Lampa.Utils;
-		var Timeline = Lampa.Timeline;
-		var Lang = Lampa.Lang;
 		var key = cardData.original_title || cardData.title;
-		if (!key) return;
-		var viewData = Timeline.view(Utils.hash(key));
-		if (!viewData || !viewData.percent) return;
-		var statusText = Lang.translate("title_viewed");
-		var timeText = "";
-		if (viewData.time && viewData.time > 0) {
-			timeText = Utils.secondsToTimeHuman(viewData.time);
-		} else {
-			timeText = viewData.percent + "%";
-		}
-		var itemsToDraw = [
+		var viewData = key && Lampa.Timeline.view(Lampa.Utils.hash(key));
+		if (!viewData || !viewData.percent) return drawHTML(cardNode, []);
+		var timeText = viewData.time > 0 ? Lampa.Utils.secondsToTimeHuman(viewData.time) : viewData.percent + "%";
+		drawHTML(cardNode, [
 			{
-				title: statusText + " " + timeText,
+				title: escapeHtml(Lampa.Lang.translate("title_viewed") + " " + timeText),
 				percent: viewData.percent,
 				isCurrent: true,
-				isMovie: true,
 			},
-		];
-		drawHTML(cardNode, itemsToDraw, true);
+		]);
 	}
 	function renderCard(cardNode, cardData) {
-		var isSeries = (typeof cardData.number_of_seasons !== "undefined" && cardData.number_of_seasons > 0) || cardData.original_name;
+		if (!cardData || cardNode.classList.contains("card--wide")) return;
+		cardNode.epDesignRequest = (cardNode.epDesignRequest || 0) + 1;
+		var isSeries = cardData.number_of_seasons > 0 || cardData.original_name || cardData.media_type === "tv";
 		if (isSeries) {
 			processSeries(cardNode, cardData);
 		} else {
@@ -330,72 +253,37 @@
 		}
 	}
 	function startPlugin() {
-		Lampa.Listener.follow("activity", function(e) {
-			if (e.component === "favorite" && (e.type === "start" || e.type === "create")) {
-				setTimeout(function() {
-					var cards = document.querySelectorAll(".card");
-					cards.forEach(function(card) {
-						var data = card.data || (window.jQuery && window.jQuery(card).data("data")) || card.card_data;
-						if (!card.dataset.spfFavBound) {
-							card.dataset.spfFavBound = "true";
-							$(card).on("hover:focus", function() {
-								renderCard(card, data);
-							});
-							if (data && !card.dataset.epDesignProcessed) {
-								card.dataset.epDesignProcessed = "true";
-								renderCard(card, data);
-							}
-						}
-					});
-				}, 500);
-			}
-		});
-
-		window.addEventListener("tvmaze_loaded", function (e) {
-			if (e.detail && e.detail.id) {
-				var cards = document.querySelectorAll(".card");
-				cards.forEach(function (card) {
-					if (card.classList.contains("card--wide")) return;
-					var data = card.data || (window.jQuery && window.jQuery(card).data("data")) || card.card_data;
-					if (data && data.id == e.detail.id) {
-						renderCard(card, data);
-					}
-				});
-			}
-		});
 		injectStyles();
-		var processCard = function (cardInstance) {
-			if (!cardInstance || !cardInstance.render) return;
-			var cardNode = cardInstance.render(true);
-			if (!cardNode || cardNode.classList.contains("card--wide")) return;
-			if (cardNode.dataset.epDesignProcessed) return;
-			var data = cardNode.data || (window.jQuery && window.jQuery(cardNode).data("data")) || cardNode.card_data;
-			if (!data && cardInstance.data) data = cardInstance.data;
-			if (data) {
-				cardNode.dataset.epDesignProcessed = "true";
-				renderCard(cardNode, data);
-				var origOnFocus = cardInstance.onFocus;
-				cardInstance.onFocus = function (target, card_data) {
-					renderCard(cardNode, card_data || data);
-					if (origOnFocus) origOnFocus(target, card_data);
-				};
-			}
-		};
-		Lampa.Listener.follow("line", function (e) {
-			if (e.type === "append" && e.items && e.items.length) {
-				var lastCard = e.items[e.items.length - 1];
-				processCard(lastCard);
-			}
+		function updateCard(card) {
+			var data = card.card_data || card.data || (window.jQuery && window.jQuery(card).data("data"));
+			renderCard(card, data);
+		}
+		function updateFocused() {
+			document.querySelectorAll(".card.focus").forEach(updateCard);
+		}
+		function onCardEvent(e) {
+			var card = e.target.closest && e.target.closest(".card");
+			if (!card) return;
+			if (e.type === "mouseover" && e.relatedTarget && card.contains(e.relatedTarget)) return;
+			updateCard(card);
+		}
+		["hover:focus", "hover:touch", "hover:hover", "mouseover", "update"].forEach(function (event) {
+			document.addEventListener(event, onCardEvent, true);
 		});
-		Lampa.Listener.follow("full", function (e) {
-			if (e.type === "complite" && e.link && e.link.items) {
-				e.link.items.forEach(function (item) {
-					if (item && item.items) {
-						item.items.forEach(processCard);
-					}
-				});
-			}
+		Lampa.Listener.follow("activity", function (e) {
+			if (e.type === "start") setTimeout(updateFocused, 0);
 		});
+		Lampa.Listener.follow("state:changed", function (e) {
+			if (e.target === "timeline" || e.target === "timetable") updateFocused();
+		});
+		window.addEventListener("tvmaze_loaded", function (e) {
+			if (!e.detail || !e.detail.id) return;
+			document.querySelectorAll(".card").forEach(function (card) {
+				var data = card.card_data || card.data || (window.jQuery && window.jQuery(card).data("data"));
+				if (data && data.id == e.detail.id) renderCard(card, data);
+			});
+		});
+		updateFocused();
 	}
 	if (window.appready) {
 		startPlugin();

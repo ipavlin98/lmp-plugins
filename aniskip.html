@@ -718,32 +718,12 @@
 			}
 
 			.code-actions span {
-				font-family: "JetBrains Mono", monospace;
 				font-size: 0.75rem;
+				font-weight: 500;
 				color: var(--muted-foreground);
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
-			}
-
-			.code-actions span::before {
-				content: "";
-				width: 8px;
-				height: 8px;
-				border-radius: 50%;
-				background: var(--success);
-				animation: pulse 2s ease-in-out infinite;
-			}
-
-			@keyframes pulse {
-				0%,
-				100% {
-					opacity: 0.4;
-				}
-
-				50% {
-					opacity: 1;
-				}
 			}
 
 			.code-scroll {
@@ -760,6 +740,203 @@
 				margin: 0;
 				white-space: pre-wrap;
 				word-break: break-word;
+			}
+
+			.code-scroll .empty-state,
+			.code-scroll .notice {
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+			}
+
+			.is-busy {
+				gap: 0.5rem;
+				cursor: progress !important;
+			}
+
+			.btn:disabled {
+				cursor: progress;
+				opacity: 0.75;
+			}
+
+			.btn .spinner,
+			.vote-btn .spinner,
+			.search-status .spinner {
+				width: 14px;
+				height: 14px;
+				border-color: currentColor;
+				border-top-color: transparent;
+				flex-shrink: 0;
+			}
+
+			.search-status {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+				padding: 1rem;
+				color: var(--muted-foreground);
+				font-size: 0.8rem;
+				text-align: center;
+			}
+
+			.ep-badge.loading {
+				position: relative;
+				color: transparent;
+				cursor: progress;
+			}
+
+			.ep-badge.loading::after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 14px;
+				height: 14px;
+				margin: -7px 0 0 -7px;
+				border: 2px solid var(--border);
+				border-top-color: var(--muted-foreground);
+				border-radius: 50%;
+				animation: spin 0.7s linear infinite;
+			}
+
+			.progress {
+				width: 100%;
+				max-width: 16rem;
+				height: 4px;
+				margin-top: 0.25rem;
+				background: var(--secondary);
+				border-radius: 2px;
+				overflow: hidden;
+			}
+
+			.progress-bar {
+				width: 0;
+				height: 100%;
+				background: var(--foreground);
+				border-radius: 2px;
+				transition: width 0.25s ease;
+			}
+
+			.code-container:has(.welcome) .code-actions {
+				display: none;
+			}
+
+			.empty-title {
+				color: var(--foreground);
+				font-weight: 600;
+				font-size: 0.9375rem !important;
+			}
+
+			.empty-state .empty-text {
+				max-width: 26rem;
+				line-height: 1.5;
+			}
+
+			.steps {
+				list-style: none;
+				counter-reset: step;
+				margin: 0.75rem 0 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.625rem;
+				text-align: left;
+				max-width: 24rem;
+				width: 100%;
+			}
+
+			.steps li {
+				counter-increment: step;
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 0.625rem 0.875rem;
+				border: 1px solid var(--border-subtle);
+				border-radius: var(--radius);
+				background: var(--card);
+				font-size: 0.8125rem;
+			}
+
+			.steps li::before {
+				content: counter(step);
+				flex-shrink: 0;
+				width: 1.5rem;
+				height: 1.5rem;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--secondary);
+				color: var(--foreground);
+				font-size: 0.75rem;
+				font-weight: 600;
+			}
+
+			.steps b {
+				color: var(--foreground);
+				font-weight: 500;
+			}
+
+			.legend {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 1rem;
+				margin-top: 0.5rem;
+				font-size: 0.75rem;
+			}
+
+			.legend-item {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.375rem;
+			}
+
+			.legend-item::before {
+				content: "";
+				width: 10px;
+				height: 10px;
+				border-radius: 3px;
+				border: 1px solid;
+			}
+
+			.legend-item.found::before {
+				background: var(--success-muted);
+				border-color: rgba(34, 197, 94, 0.5);
+			}
+
+			.legend-item.missing::before {
+				background: rgba(239, 68, 68, 0.08);
+				border-color: rgba(239, 68, 68, 0.5);
+			}
+
+			.notice {
+				font-size: 0.8125rem;
+				color: var(--muted-foreground);
+				background: var(--card);
+				border: 1px solid var(--border-subtle);
+				border-radius: calc(var(--radius) - 2px);
+				padding: 0.75rem 1rem;
+				margin: 0 0 0.5rem;
+				line-height: 1.5;
+			}
+
+			.notice b {
+				color: var(--foreground);
+				font-weight: 500;
+			}
+
+			.notice.success {
+				color: var(--success-accent);
+				background: var(--success-muted);
+				border-color: rgba(34, 197, 94, 0.3);
+				margin-top: 1rem;
+			}
+
+			.raw-response summary {
+				cursor: pointer;
+				color: var(--muted-foreground);
+				font-size: 0.75rem;
+				margin: 0.5rem 0;
 			}
 
 			.sh-key {
@@ -2383,22 +2560,41 @@
 						stroke-linejoin="round"
 					/>
 				</symbol>
-				<symbol id="icon-terminal" viewBox="0 0 24 24">
-					<polyline
-						points="16 18 22 12 16 6"
+				<symbol id="icon-skip" viewBox="0 0 24 24">
+					<polygon
+						points="5 4 15 12 5 20 5 4"
 						fill="none"
 						stroke="currentColor"
 						stroke-width="1.5"
 						stroke-linecap="round"
 						stroke-linejoin="round"
 					/>
-					<polyline
-						points="8 6 2 12 8 18"
+					<line
+						x1="19"
+						y1="5"
+						x2="19"
+						y2="19"
 						fill="none"
 						stroke="currentColor"
 						stroke-width="1.5"
 						stroke-linecap="round"
-						stroke-linejoin="round"
+					/>
+				</symbol>
+				<symbol id="icon-alert" viewBox="0 0 24 24">
+					<circle
+						cx="12"
+						cy="12"
+						r="10"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+					/>
+					<path
+						d="M12 8v4M12 16h.01"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
 					/>
 				</symbol>
 				<symbol id="icon-arrow-right" viewBox="0 0 24 24">
@@ -2533,24 +2729,25 @@
 		<div class="layout">
 			<aside class="sidebar">
 				<div>
-					<h2>Параметры</h2>
-					<p class="hint">Конфигурация запроса к Aniskip API</p>
+					<h2>Aniskip</h2>
+					<p class="hint">Таймкоды опенингов и эндингов аниме</p>
 				</div>
 
 				<div class="form-group" style="position: relative">
-					<label>Поиск Jikan API</label>
+					<label>Аниме</label>
 					<div style="display: flex; gap: 0.5rem">
 						<input
 							type="text"
 							id="searchTerm"
 							value="Frieren"
-							placeholder="Название..."
+							placeholder="Название аниме..."
 							autocomplete="off"
 						/>
 						<button
 							class="btn btn-outline btn-icon"
 							type="button"
 							data-action="search-jikan"
+							title="Найти"
 						>
 							<svg
 								width="15"
@@ -2593,6 +2790,7 @@
 						value="52991"
 						placeholder="Anime ID"
 					/>
+					<p class="hint">Подставляется автоматически при выборе аниме из поиска</p>
 				</div>
 
 				<!-- <div class="form-group">
@@ -2603,7 +2801,7 @@
 
 				<div class="form-group">
 					<label style="margin-bottom: 0.75rem"
-						>Типы пропуска (Skip Types)</label
+						>Что пропускать</label
 					>
 					<div class="checkbox-grid">
 						<label class="checkbox-wrapper">
@@ -2613,7 +2811,7 @@
 									<use href="#icon-check"></use>
 								</svg>
 							</div>
-							<span class="checkbox-label">OP</span>
+							<span class="checkbox-label">Опенинг</span>
 						</label>
 						<label class="checkbox-wrapper">
 							<input type="checkbox" class="type-chk" value="ed" checked />
@@ -2622,7 +2820,7 @@
 									<use href="#icon-check"></use>
 								</svg>
 							</div>
-							<span class="checkbox-label">ED</span>
+							<span class="checkbox-label">Эндинг</span>
 						</label>
 						<label class="checkbox-wrapper checkbox-full-width">
 							<input type="checkbox" class="type-chk" value="recap" checked />
@@ -2631,35 +2829,33 @@
 									<use href="#icon-check"></use>
 								</svg>
 							</div>
-							<span class="checkbox-label">Recap</span>
+							<span class="checkbox-label">Пересказ прошлой серии</span>
 						</label>
 						<label class="checkbox-wrapper">
 							<input
 								type="checkbox"
 								class="type-chk"
 								value="mixed-op"
-								checked
 							/>
 							<div class="custom-checkbox">
 								<svg viewBox="0 0 24 24" aria-hidden="true">
 									<use href="#icon-check"></use>
 								</svg>
 							</div>
-							<span class="checkbox-label">Mixed-OP</span>
+							<span class="checkbox-label">Mixed OP</span>
 						</label>
 						<label class="checkbox-wrapper">
 							<input
 								type="checkbox"
 								class="type-chk"
 								value="mixed-ed"
-								checked
 							/>
 							<div class="custom-checkbox">
 								<svg viewBox="0 0 24 24" aria-hidden="true">
 									<use href="#icon-check"></use>
 								</svg>
 							</div>
-							<span class="checkbox-label">Mixed-ED</span>
+							<span class="checkbox-label">Mixed ED</span>
 						</label>
 					</div>
 				</div>
@@ -2667,31 +2863,31 @@
 				<div class="separator"></div>
 
 				<div>
-					<div class="section-title">Одиночный запрос</div>
+					<div class="section-title">Одна серия</div>
 					<div class="grid-2">
-						<input type="number" id="epNum" value="1" placeholder="№" />
+						<input type="number" id="epNum" value="1" placeholder="Серия" />
 						<button
 							class="btn btn-outline"
 							type="button"
 							data-action="fetch-single"
 						>
-							Проверить
+							Открыть
 						</button>
 					</div>
 				</div>
 
 				<div>
-					<div class="section-title">Загрузка сезона</div>
+					<div class="section-title">Весь сезон</div>
 					<div class="grid-2" style="margin-bottom: 0.75rem">
 						<div style="position: relative">
 							<label style="font-size: 0.75rem; color: var(--muted-foreground)"
-								>С</label
+								>С серии</label
 							>
 							<input type="number" id="seasonStart" value="1" />
 						</div>
 						<div style="position: relative">
 							<label style="font-size: 0.75rem; color: var(--muted-foreground)"
-								>По</label
+								>По серию</label
 							>
 							<input type="number" id="seasonEnd" value="28" />
 						</div>
@@ -2701,14 +2897,14 @@
 						type="button"
 						data-action="fetch-season"
 					>
-						Загрузить диапазон
+						Показать серии
 					</button>
 				</div>
 
 				<div class="separator" id="batchSeparator"></div>
 
 				<div id="batchSection">
-					<div class="section-title">Пакетная обработка</div>
+					<div class="section-title">Импорт и отправка</div>
 					<div class="grid-2">
 						<button
 							class="btn btn-outline"
@@ -2761,8 +2957,10 @@
 
 				<div class="output-header">
 					<div>
-						<h2 id="resultTitle">Консоль</h2>
-						<p class="hint">Результаты запросов</p>
+						<h2 id="resultTitle">Таймкоды</h2>
+						<p class="hint" id="resultHint">
+							Найдите аниме, чтобы увидеть таймкоды
+						</p>
 					</div>
 					<button
 						id="collapseBtn"
@@ -2779,7 +2977,7 @@
 						style="width: auto; height: 2rem"
 						data-action="clear-log"
 					>
-						Очистить
+						Сбросить
 					</button>
 				</div>
 
@@ -2787,7 +2985,7 @@
 
 				<div class="code-container">
 					<div class="code-actions">
-						<span id="codeLabel">Терминал</span>
+						<span id="codeLabel"></span>
 						<button
 							id="copyResultBtn"
 							class="btn btn-outline"
@@ -2810,20 +3008,33 @@
 							>
 								<use href="#icon-copy"></use>
 							</svg>
-							Копировать
+							Копировать JSON
 						</button>
 					</div>
-					<div class="code-scroll" id="codeOutput">
-						<div class="empty-state">
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								<use href="#icon-terminal"></use>
-							</svg>
-							<p>Ожидание действий...</p>
-						</div>
-					</div>
+					<div class="code-scroll" id="codeOutput"></div>
 				</div>
 			</main>
 		</div>
+
+		<template id="welcomeTemplate">
+			<div class="empty-state welcome">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<use href="#icon-skip"></use>
+				</svg>
+				<p class="empty-title">Пропускайте опенинги и эндинги</p>
+				<p class="empty-text">
+					Здесь собраны таймкоды из открытой базы AniSkip: где в серии
+					начинается и заканчивается опенинг, эндинг или пересказ.
+				</p>
+				<ol class="steps">
+					<li><span><b>Найдите аниме</b> по названию</span></li>
+					<li><span><b>Откройте серию</b> или весь сезон</span></li>
+					<li>
+						<span><b>Проверьте таймкоды</b>, оцените их или добавьте свои</span>
+					</li>
+				</ol>
+			</div>
+		</template>
 
 		<template id="searchItemTemplate">
 			<button type="button" class="search-item">
@@ -2848,7 +3059,7 @@
 						<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
 							<use href="#icon-plus"></use>
 						</svg>
-						Добавить пропуск для Ep <span class="skip-editor-ep-num"></span>
+						Новый таймкод · серия <span class="skip-editor-ep-num"></span>
 					</div>
 					<div class="editor-header-actions">
 						<button
@@ -3106,12 +3317,16 @@
 			(() => {
 				const ANISKIP_BASE = "https://api.aniskip.com/v2/skip-times";
 				const ANISKIP_VOTE_BASE = "https://api.aniskip.com/v2/skip-times/vote";
+				const ANILIST_API = "https://graphql.anilist.co";
+				const JIKAN_API = "https://api.jikan.moe/v4/anime";
 				const SHOW_BATCH_PROCESSING = false;
 
 				const $ = (id) => document.getElementById(id);
 
 				let expandSheet = null;
 				let collapseSheet = null;
+				let searchGeneration = 0;
+				let requestGeneration = 0;
 
 				/** Единое состояние приложения */
 				const AppState = {
@@ -3127,7 +3342,16 @@
 					seasonResults: new Map(),
 					timelineController: null,
 					scrollWheels: [],
-					currentEp: 0
+					currentEp: 0,
+					animeTitle: ""
+				};
+
+				const SKIP_TYPE_LABELS = {
+					op: "Опенинг",
+					ed: "Эндинг",
+					recap: "Пересказ",
+					"mixed-op": "Mixed OP",
+					"mixed-ed": "Mixed ED"
 				};
 
 				/** Утилиты для работы со временем */
@@ -3154,29 +3378,97 @@
 					}
 				}
 
-				/** Сервис общения с API */
+				async function requestJson(url, options) {
+					const res = await fetch(url, options);
+					const data = await res.json();
+					if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+					return data;
+				}
+
+				function normalizeSkipData(data) {
+					const results = (Array.isArray(data?.results) ? data.results : [])
+						.filter((skip) => skip?.interval)
+						.map((skip) => {
+							const start = skip.interval.startTime ?? skip.interval.start_time;
+							const end = skip.interval.endTime ?? skip.interval.end_time;
+							return {
+								...skip,
+								skipType: String(skip.skipType || skip.skip_type || "").toLowerCase(),
+								skipId: skip.skipId ?? skip.skip_id,
+								episodeLength: Number(skip.episodeLength ?? skip.episode_length) || 0,
+								interval: {
+									startTime: start == null ? NaN : Number(start),
+									endTime: end == null ? NaN : Number(end)
+								}
+							};
+						})
+						.filter((skip) =>
+							["op", "ed", "recap", "mixed-op", "mixed-ed"].includes(skip.skipType) &&
+							Number.isFinite(skip.interval.startTime) &&
+							Number.isFinite(skip.interval.endTime) &&
+							skip.interval.endTime > skip.interval.startTime
+						);
+					return { ...data, found: results.length > 0, results };
+				}
+
 				const ApiService = {
 					searchAnime: async (query) => {
-						const res = await fetch(
-							`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`
-						);
-						const json = await res.json();
-						return json.data || [];
+						try {
+							const json = await requestJson(ANILIST_API, {
+								method: "POST",
+								headers: { "Content-Type": "application/json", Accept: "application/json" },
+								body: JSON.stringify({
+									query: `query ($search: String) {
+										Page(page: 1, perPage: 10) {
+											media(search: $search, type: ANIME) {
+												idMal
+												title { romaji english native }
+												episodes
+												duration
+												coverImage { medium }
+											}
+										}
+									}`,
+									variables: { search: query }
+								})
+							});
+							const media = json.data?.Page?.media;
+							const items = (Array.isArray(media) ? media : [])
+								.filter((item) => item?.idMal)
+								.map((item) => ({
+									mal_id: item.idMal,
+									title: item.title?.romaji || item.title?.english || item.title?.native || String(item.idMal),
+									episodes: item.episodes,
+									duration: item.duration ? `${item.duration} min` : "",
+									image: item.coverImage?.medium
+								}));
+							if (items.length) return items;
+						} catch (_) {}
+						const json = await requestJson(`${JIKAN_API}?q=${encodeURIComponent(query)}&limit=10`);
+						return (Array.isArray(json.data) ? json.data : [])
+							.filter((item) => item?.mal_id)
+							.map((item) => ({ ...item, image: item.images?.jpg?.small_image_url }));
 					},
 
 					getAnimeById: async (malId) => {
-						const res = await fetch(`https://api.jikan.moe/v4/anime/${malId}`);
-						const json = await res.json();
+						const json = await requestJson(
+							`${JIKAN_API}/${malId}`,
+							AbortSignal.timeout ? { signal: AbortSignal.timeout(10000) } : undefined
+						);
 						return json.data || null;
 					},
 
-					getSkipTimes: async (malId, ep, types, episodeLength) => {
+					getSkipTimes: async (malId, ep, types) => {
 						const params = new URLSearchParams();
 						(types || []).forEach((t) => params.append("types", t));
-						params.append("episodeLength", episodeLength);
+						params.append("episodeLength", "0");
 						const url = `${ANISKIP_BASE}/${malId}/${ep}?${params.toString()}`;
 						const res = await fetch(url);
-						return res.json();
+						const data = await res.json();
+						if (!res.ok && !(res.status === 404 && data.found === false)) {
+							throw new Error(data.message || `HTTP ${res.status}`);
+						}
+						return normalizeSkipData(data);
 					},
 
 					/** Отправка skip time */
@@ -3291,12 +3583,81 @@
 					}, 3000);
 				}
 
+				function setHeader(hint, label) {
+					$("resultTitle").textContent = AppState.animeTitle || "Таймкоды";
+					$("resultHint").textContent = hint;
+					if (label !== undefined) $("codeLabel").textContent = label;
+				}
+
+				function renderState({ icon, spinner, title, text } = {}) {
+					const box = document.createElement("div");
+					box.className = "empty-state";
+					if (spinner) {
+						const s = document.createElement("div");
+						s.className = "spinner";
+						box.appendChild(s);
+					}
+					if (icon) {
+						box.insertAdjacentHTML(
+							"beforeend",
+							`<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-${icon}"></use></svg>`
+						);
+					}
+					if (title) {
+						const p = document.createElement("p");
+						p.className = "empty-title";
+						p.textContent = title;
+						box.appendChild(p);
+					}
+					if (text) {
+						const p = document.createElement("p");
+						p.className = "empty-text";
+						p.textContent = text;
+						box.appendChild(p);
+					}
+					$("codeOutput").replaceChildren(box);
+					return box;
+				}
+
+				function renderWelcome() {
+					$("codeOutput").replaceChildren(
+						$("welcomeTemplate").content.cloneNode(true)
+					);
+					setHeader(
+						AppState.animeTitle
+							? "Откройте серию или весь сезон"
+							: "Найдите аниме, чтобы увидеть таймкоды",
+						""
+					);
+				}
+
+				function renderMissingEpisode(epNum, json, error) {
+					const notice = error
+						? `Не удалось загрузить серию ${epNum}: ${error}`
+						: `Для серии ${epNum} таймкодов пока нет. Отметьте их сами — они попадут в общую базу AniSkip и помогут другим зрителям.`;
+					$("codeOutput").innerHTML = `
+						<div class="tabs">
+							<button class="tab active" type="button" data-tab="editor">Добавить</button>
+							<button class="tab" type="button" data-tab="json">JSON</button>
+						</div>
+						<div id="tabEditor" class="tab-content active">
+							<p class="notice"></p>
+						</div>
+						<div id="tabJson" class="tab-content">
+							<pre>${syntaxHighlight(json)}</pre>
+						</div>
+					`;
+					const editorTab = $("tabEditor");
+					editorTab.querySelector(".notice").textContent = notice;
+					editorTab.appendChild(renderSkipEditor(epNum));
+					initSkipEditor();
+				}
+
 				function clearLog() {
+					requestGeneration++;
+					resetResults();
 					$("gridContainer").innerHTML = "";
-					$("codeOutput").innerHTML =
-						'<div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow-right"></use></svg><p>Консоль очищена</p></div>';
-					$("codeLabel").innerText = "Терминал";
-					$("resultTitle").innerText = "Консоль";
+					renderWelcome();
 
 					const collapseBtn = $("collapseBtn");
 					if (collapseBtn) collapseBtn.classList.remove("visible");
@@ -3305,6 +3666,49 @@
 					if (copyBtn) copyBtn.style.visibility = "hidden";
 
 					if (typeof collapseSheet === "function") collapseSheet();
+				}
+
+				function setBusy(btn, busy, label) {
+					if (!btn) return;
+					if (busy) {
+						if (btn.classList.contains("is-busy")) return;
+						btn.dataset.idleHtml = btn.innerHTML;
+						btn.disabled = true;
+						btn.classList.add("is-busy");
+						btn.innerHTML = '<span class="spinner"></span>';
+						if (label) {
+							const text = document.createElement("span");
+							text.textContent = label;
+							btn.appendChild(text);
+						}
+					} else if (btn.classList.contains("is-busy")) {
+						btn.innerHTML = btn.dataset.idleHtml || "";
+						delete btn.dataset.idleHtml;
+						btn.disabled = false;
+						btn.classList.remove("is-busy");
+					}
+				}
+
+				function resetResults() {
+					document
+						.querySelectorAll('[data-action^="fetch-"].is-busy')
+						.forEach((btn) => setBusy(btn, false));
+					AppState.seasonResults = new Map();
+					AppState.smartIntervals = {};
+					AppState.currentEp = 0;
+					AppState.timelineController?.destroy();
+					AppState.timelineController = null;
+					AppState.scrollWheels.forEach((wheel) => wheel.destroy());
+					AppState.scrollWheels = [];
+				}
+
+				function updateEpisodeDuration(results) {
+					const duration = Math.max(0, ...results.map((skip) =>
+						Math.max(skip.episodeLength, skip.interval.endTime)
+					));
+					AppState.realEpisodeDuration = duration > 0
+						? Math.ceil(duration / 60) * 60 + 60
+						: AppState.jikanDuration || 1440;
 				}
 
 				function saveSearchSettings() {
@@ -3359,6 +3763,7 @@
 				}
 				loadSearchSettings();
 				initGridState();
+				renderWelcome();
 
 				const searchJikan = async () => {
 					const q = $("searchTerm").value.trim();
@@ -3366,19 +3771,25 @@
 					const resultsList = $("searchResultsList");
 
 					if (!q) return;
+					const token = ++searchGeneration;
+					const searchBtn = document.querySelector('[data-action="search-jikan"]');
+					setBusy(searchBtn, true);
 
 					resultsWrapper.classList.add("active");
 					resultsList.innerHTML =
-						'<div style="padding:1rem; text-align:center; color:var(--muted-foreground); font-size:0.8rem;">Загрузка...</div>';
+						'<div class="search-status"><span class="spinner"></span>Ищем аниме…</div>';
 
 					try {
 						const items = await ApiService.searchAnime(q);
+						if (token !== searchGeneration) return;
 						resultsList.innerHTML = "";
 
 						if (!items || items.length === 0) {
 							resultsList.innerHTML =
-								'<div style="padding:1rem; text-align:center; color:var(--muted-foreground)">Ничего не найдено</div>';
-							setTimeout(() => resultsWrapper.classList.remove("active"), 2000);
+								'<div class="search-status">Ничего не найдено</div>';
+							setTimeout(() => {
+								if (token === searchGeneration) resultsWrapper.classList.remove("active");
+							}, 2000);
 							return;
 						}
 
@@ -3393,38 +3804,63 @@
 
 							btn.dataset.malId = item.mal_id;
 							btn.dataset.duration = dur;
+							btn.dataset.title = item.title;
 							if (item.episodes) btn.dataset.episodes = item.episodes;
 
 							const img = btn.querySelector("img");
-							if (img) img.src = item.images.jpg.small_image_url;
+							if (img && item.image) img.src = item.image;
 							const titleEl = btn.querySelector("b");
 							if (titleEl) titleEl.textContent = item.title;
 							const metaEl = btn.querySelector("span");
 							if (metaEl)
-								metaEl.textContent = `MAL: ${item.mal_id} • Ep: ${totalEps} • ${dur}s`;
+								metaEl.textContent = [
+									`MAL ${item.mal_id}`,
+									`${totalEps} эп.`,
+									dur > 0 ? `${Math.round(dur / 60)} мин` : ""
+								]
+									.filter(Boolean)
+									.join(" · ");
 
 							resultsList.appendChild(node);
 						});
 					} catch (e) {
-						resultsList.innerHTML = `<div style="padding:0.5rem; color:var(--destructive)">Ошибка: ${e.message}</div>`;
+						if (token !== searchGeneration) return;
+						const status = document.createElement("div");
+						status.className = "search-status";
+						status.textContent = `Поиск не удался: ${e.message}`;
+						resultsList.replaceChildren(status);
+					} finally {
+						if (token === searchGeneration) setBusy(searchBtn, false);
 					}
 				};
 
 				async function fetchSingle() {
-					const malId = $("malId").value;
+					const malId = Number($("malId").value);
 					const epNumInput = $("epNum");
-					const epNum = epNumInput ? epNumInput.value : AppState.currentEp;
-					const epDur = $("epDur") ? $("epDur").value : "0";
+					const epNum = Number(epNumInput ? epNumInput.value : AppState.currentEp);
 					const types = getTypes();
+
+					if (!Number.isSafeInteger(malId) || malId < 1 || !Number.isSafeInteger(epNum) || epNum < 1) {
+						showToast("Укажите положительные целые MAL ID и номер эпизода", "error");
+						return;
+					}
 
 					if (types.length === 0) {
 						alert("Выберите типы пропуска");
 						return;
 					}
 
-					const codeOut = $("codeOutput");
-					codeOut.innerHTML =
-						'<div style="padding:1rem; color:var(--muted-foreground)">Загрузка...</div>';
+					const token = ++requestGeneration;
+					resetResults();
+					const singleBtn = document.querySelector('[data-action="fetch-single"]');
+					setBusy(singleBtn, true);
+					$("gridContainer").innerHTML = "";
+					setHeader(`Серия ${epNum} · загружаем…`, `Серия ${epNum}`);
+					renderState({
+						spinner: true,
+						title: "Загружаем таймкоды",
+						text: `Ищем таймкоды для серии ${epNum}…`
+					});
 
 					if (typeof expandSheet === "function") expandSheet();
 
@@ -3432,13 +3868,12 @@
 						const data = await ApiService.getSkipTimes(
 							malId,
 							epNum,
-							types,
-							epDur
+							types
 						);
-
-						$("gridContainer").innerHTML = "";
-						$("resultTitle").innerText = `Результат Ep ${epNum}`;
-						$("codeLabel").innerText = `Эпизод ${epNum}`;
+						if (token !== requestGeneration) return;
+						AppState.currentEp = epNum;
+						AppState.seasonResults.set(epNum, { ep: epNum, data, found: data.found });
+						updateEpisodeDuration(data.results);
 
 						const collapseBtn = $("collapseBtn");
 						if (collapseBtn) collapseBtn.classList.remove("visible");
@@ -3447,24 +3882,22 @@
 						if (copyBtn) copyBtn.style.visibility = "hidden";
 
 						if (data.found && data.results && data.results.length > 0) {
+							setHeader(`Серия ${epNum} · найдено таймкодов: ${data.results.length}`);
 							renderSkipCards(data.results, epNum);
 						} else {
-							codeOut.innerHTML = `
-							<div class="tabs">
-								<button class="tab active" type="button" data-tab="editor">Добавить</button>
-								<button class="tab" type="button" data-tab="json">JSON</button>
-							</div>
-							<div id="tabEditor" class="tab-content active"></div>
-							<div id="tabJson" class="tab-content">
-								<pre>${syntaxHighlight(data)}</pre>
-							</div>
-						`;
-							const editorTab = $("tabEditor");
-							if (editorTab) editorTab.appendChild(renderSkipEditor(epNum));
-							initSkipEditor();
+							setHeader(`Серия ${epNum} · таймкодов пока нет`);
+							renderMissingEpisode(epNum, data);
 						}
 					} catch (e) {
-						codeOut.innerHTML = `<span style="color:var(--destructive)">Error: ${e.message}</span>`;
+						if (token !== requestGeneration) return;
+						setHeader(`Серия ${epNum} · ошибка загрузки`);
+						renderState({
+							icon: "alert",
+							title: "Не удалось загрузить таймкоды",
+							text: e.message
+						});
+					} finally {
+						if (token === requestGeneration) setBusy(singleBtn, false);
 					}
 				}
 
@@ -3472,9 +3905,9 @@
 					const codeOut = $("codeOutput");
 
 					let html = `<div class="tabs">
-					<button class="tab active" type="button" data-tab="cards">Карточки</button>
+					<button class="tab active" type="button" data-tab="cards">Таймкоды</button>
+					<button class="tab" type="button" data-tab="editor">Добавить свой</button>
 					<button class="tab" type="button" data-tab="json">JSON</button>
-					<button class="tab" type="button" data-tab="editor">Редактор</button>
 				</div>
 				<div id="tabCards" class="tab-content active">`;
 
@@ -3491,7 +3924,7 @@
 				<div class="skip-card ${importedClass}">
 					<div class="skip-card-header">
 						<div class="skip-card-header-left">
-							<span class="skip-card-type ${typeClass}">${skip.skipType.toUpperCase()}</span>
+							<span class="skip-card-type ${typeClass}">${SKIP_TYPE_LABELS[skip.skipType] || skip.skipType}</span>
 						</div>
 						<div class="skip-card-header-right">
 							<span class="skip-card-times">${TimeUtils.fmt(skip.interval.startTime)} → ${TimeUtils.fmt(skip.interval.endTime)}</span>
@@ -3499,8 +3932,8 @@
 						</div>
 					</div>
 					<div class="skip-card-meta">
-						Длительность: ${TimeUtils.fmt(skip.interval.endTime - skip.interval.startTime)} •
-						Длительность эпизода: ${TimeUtils.fmt(skip.episodeLength)}
+						Длится ${TimeUtils.fmt(skip.interval.endTime - skip.interval.startTime)} ·
+						Серия ${TimeUtils.fmt(skip.episodeLength)}
 					</div>
 					${
 						skip._isNew
@@ -3557,27 +3990,34 @@
 				};
 
 				const voteSkip = async (skipId, voteType, btn) => {
+					const group = btn.closest(".vote-container").querySelectorAll(".vote-btn");
+					group.forEach((b) => (b.disabled = true));
+					setBusy(btn, true, "Отправляем…");
 					try {
-						const { res } = await ApiService.vote(skipId, voteType);
+						const { res, data } = await ApiService.vote(skipId, voteType);
 
 						if (res.status === 429) {
 							showToast("Превышен лимит голосов", "error");
 							return;
 						}
+						if (!res.ok) {
+							showToast(`Ошибка: ${data.message || res.status}`, "error");
+							return;
+						}
 
 						btn.classList.add("voted");
-						btn
-							.closest(".vote-container")
-							.querySelectorAll(".vote-btn")
-							.forEach((b) => {
-								if (b !== btn) b.style.opacity = "0.5";
-							});
+						group.forEach((b) => {
+							if (b !== btn) b.style.opacity = "0.5";
+						});
 
 						showToast(
 							voteType === "upvote" ? "Спасибо за голос!" : "Голос учтён"
 						);
 					} catch (e) {
 						showToast("Ошибка при голосовании", "error");
+					} finally {
+						setBusy(btn, false);
+						group.forEach((b) => (b.disabled = false));
 					}
 				};
 
@@ -4411,6 +4851,8 @@
 						submitterId
 					};
 
+					const submitBtn = document.querySelector('[data-action="submit-skip"]');
+					setBusy(submitBtn, true, "Отправляем в AniSkip…");
 					try {
 						const { res, data } = await ApiService.submitSkip(
 							malId,
@@ -4421,17 +4863,23 @@
 						if (res.ok) {
 							showToast("Успешно отправлено в AniSkip!", "success");
 							$("codeOutput").innerHTML = `
-							<div style="padding:1rem; color:var(--success); border:1px solid var(--success); border-radius:var(--radius); margin-bottom:1rem; margin-top:1rem;">
-								Skip time успешно добавлен!
-							</div>
-							<pre>${syntaxHighlight(data)}</pre>
+							<p class="notice success">Таймкод добавлен в AniSkip. Спасибо — он поможет другим зрителям!</p>
+							<details class="raw-response">
+								<summary>Ответ сервера</summary>
+								<pre>${syntaxHighlight(data)}</pre>
+							</details>
 						`;
 						} else {
 							showToast(`Ошибка: ${data.message || res.status}`, "error");
-							$("codeOutput").innerHTML = `<pre>${syntaxHighlight(data)}</pre>`;
+							$("codeOutput").innerHTML = `
+							<p class="notice" style="margin-top: 1rem">Не удалось отправить таймкод.</p>
+							<pre>${syntaxHighlight(data)}</pre>
+						`;
 						}
 					} catch (e) {
 						showToast(`Ошибка сети: ${e.message}`, "error");
+					} finally {
+						setBusy(submitBtn, false);
 					}
 				}
 
@@ -4512,33 +4960,38 @@
 				}
 
 				async function fetchSeason() {
-					const malId = $("malId").value;
-					const start = parseInt($("seasonStart").value, 10);
-					const end = parseInt($("seasonEnd").value, 10);
-					const epDur = $("epDur") ? $("epDur").value : "0";
+					const malId = Number($("malId").value);
+					const start = Number($("seasonStart").value);
+					const end = Number($("seasonEnd").value);
 					const types = getTypes();
 
 					if (types.length === 0) {
 						alert("Выберите типы");
 						return;
 					}
-					if (end < start) return;
+					if (![malId, start, end].every((value) => Number.isSafeInteger(value) && value > 0) || end < start) {
+						showToast("Укажите положительные целые MAL ID и корректный диапазон эпизодов", "error");
+						return;
+					}
+					const token = ++requestGeneration;
+					resetResults();
+					const seasonBtn = document.querySelector('[data-action="fetch-season"]');
+					setBusy(seasonBtn, true, "Загружаем серии…");
 
-					try {
-						const animeData = await ApiService.getAnimeById(malId);
-						if (animeData) {
-							const dur = TimeUtils.parseDuration(animeData.duration);
-							if (dur > 0) {
-								const roundedUp = Math.ceil(dur / 60) * 60 + 60;
-								AppState.jikanDuration = roundedUp;
-								AppState.realEpisodeDuration = roundedUp;
-							}
-						}
-					} catch (e) {}
-
-					$("resultTitle").innerText = `Сезон (${start} - ${end})`;
-					$("codeOutput").innerHTML =
-						'<div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-grid"></use></svg><p>Выберите эпизод для просмотра деталей</p></div>';
+					const total = end - start + 1;
+					const rangeLabel = start === end ? `Серия ${start}` : `Серии ${start}–${end}`;
+					setHeader(`${rangeLabel} · загружаем…`, rangeLabel);
+					const loadingState = renderState({
+						spinner: true,
+						title: "Загружаем таймкоды",
+						text: `Готово 0 из ${total}. Это может занять до минуты.`
+					});
+					loadingState.insertAdjacentHTML(
+						"beforeend",
+						'<div class="progress"><div class="progress-bar"></div></div>'
+					);
+					const progressText = loadingState.querySelector(".empty-text");
+					const progressBar = loadingState.querySelector(".progress-bar");
 
 					if (typeof expandSheet === "function") expandSheet();
 
@@ -4557,27 +5010,64 @@
 						if (!badge) continue;
 						badge.id = `badge-${i}`;
 						badge.dataset.ep = i;
+						badge.textContent = i;
+						badge.classList.add("loading");
+						badge.title = "Загружается…";
 						fragment.appendChild(node);
 					}
 					grid.appendChild(fragment);
 
 					checkCollapseVisibility();
 
+					const animePromise = ApiService.getAnimeById(malId)
+						.then((animeData) => {
+							if (token !== requestGeneration || !animeData) return;
+							if (!AppState.animeTitle) AppState.animeTitle = animeData.title || "";
+							const dur = TimeUtils.parseDuration(animeData.duration);
+							if (dur > 0) {
+								AppState.jikanDuration = dur;
+								AppState.realEpisodeDuration = dur;
+							}
+						})
+						.catch(() => {});
+
+					let done = 0;
 					const promises = [];
 					for (let i = start; i <= end; i++) {
 						promises.push(
-							ApiService.getSkipTimes(malId, i, types, epDur)
+							ApiService.getSkipTimes(malId, i, types)
 								.then((data) => ({ ep: i, data, found: data?.found }))
 								.catch((error) => ({ ep: i, error }))
+								.then((result) => {
+									if (token !== requestGeneration) return result;
+									done++;
+									AppState.seasonResults.set(result.ep, result);
+									const el = document.getElementById(`badge-${result.ep}`);
+									if (el) {
+										el.className = `ep-badge ${result.found ? "found" : "missing"}`;
+										el.title = result.error
+											? `Ошибка загрузки: ${result.error.message}`
+											: "";
+									}
+									progressText.textContent = `Готово ${done} из ${total}`;
+									progressBar.style.width = `${(done / total) * 100}%`;
+									setHeader(`${rangeLabel} · загружено ${done} из ${total}`);
+									return result;
+								})
 						);
 					}
 
-					const results = await Promise.all(promises);
+					let results;
+					try {
+						[, results] = await Promise.all([animePromise, Promise.all(promises)]);
+					} finally {
+						if (token === requestGeneration) setBusy(seasonBtn, false);
+					}
+					if (token !== requestGeneration) return;
 
 					AppState.smartIntervals = {};
 					AppState.seasonResults = new Map();
 					const typeDurs = {};
-					let maxEpisodeLength = 0;
 
 					results.forEach((r) => {
 						AppState.seasonResults.set(r.ep, r);
@@ -4587,29 +5077,11 @@
 								const d = s.interval.endTime - s.interval.startTime;
 								if (!typeDurs[t]) typeDurs[t] = [];
 								typeDurs[t].push(d);
-								if (
-									s.episodeLength &&
-									s.episodeLength > 0 &&
-									s.episodeLength > maxEpisodeLength
-								) {
-									maxEpisodeLength = s.episodeLength;
-								}
 							});
 						}
 					});
 
-					if (maxEpisodeLength > 0) {
-						const roundedUp = Math.ceil(maxEpisodeLength / 60) * 60 + 60;
-						AppState.realEpisodeDuration = roundedUp;
-						AppState.jikanDuration = roundedUp;
-					} else if (
-						AppState.jikanDuration > 0 &&
-						AppState.jikanDuration !== 1440
-					) {
-						const roundedUp = Math.ceil(AppState.jikanDuration / 60) * 60 + 60;
-						AppState.realEpisodeDuration = roundedUp;
-						AppState.jikanDuration = roundedUp;
-					}
+					updateEpisodeDuration(results.flatMap((result) => result.data?.results || []));
 
 					Object.keys(typeDurs).forEach((t) => {
 						if (typeDurs[t].length >= 2) {
@@ -4627,12 +5099,20 @@
 						}
 					});
 
-					results.forEach((res) => {
-						const el = document.getElementById(`badge-${res.ep}`);
-						if (!el) return;
-						el.textContent = res.ep;
-						el.className = `ep-badge ${res.found ? "found" : "missing"}`;
-					});
+					const foundCount = results.filter((result) => result.found).length;
+					setHeader(`${rangeLabel} · таймкоды есть для ${foundCount} из ${results.length}`);
+					if (loadingState.isConnected) {
+						renderState({
+							icon: "grid",
+							title: "Выберите серию",
+							text: "Нажмите на номер серии выше, чтобы посмотреть таймкоды или добавить свои."
+						}).insertAdjacentHTML(
+							"beforeend",
+							'<div class="legend"><span class="legend-item found">Есть таймкоды</span><span class="legend-item missing">Пока нет</span></div>'
+						);
+					}
+					const failures = results.filter((result) => result.error).length;
+					if (failures) showToast(`Не удалось загрузить эпизоды: ${failures}`, "error");
 				}
 
 				function copyToClipboard() {
@@ -4789,8 +5269,17 @@
 					)
 						return;
 
-					$("codeOutput").innerHTML =
-						'<div style="padding:1rem">Начинаем отправку...</div>';
+					const totalSkips = episodesToSend.reduce(
+						(sum, item) => sum + item.results.filter((skip) => skip.interval && skip._isNew).length,
+						0
+					);
+					const bulkBtn = document.querySelector('[data-action="bulk-send"]');
+					setBusy(bulkBtn, true, "Отправляем…");
+					const progressText = renderState({
+						spinner: true,
+						title: "Отправляем таймкоды в AniSkip",
+						text: `Готово 0 из ${totalSkips}`
+					}).querySelector(".empty-text");
 
 					let successCount = 0;
 					let failCount = 0;
@@ -4819,15 +5308,20 @@
 							} catch (e) {
 								failCount++;
 							}
+							progressText.textContent = `Готово ${successCount + failCount} из ${totalSkips}`;
 						}
 					}
+					setBusy(bulkBtn, false);
 
 					showToast(
 						`Отправка завершена. Успех: ${successCount}, Ошибок: ${failCount}`,
 						failCount > 0 ? "warning" : "success"
 					);
-					$("codeOutput").innerHTML =
-						`<div style="padding:1rem">Отправка завершена.<br>Успешно: ${successCount}<br>Ошибок: ${failCount}</div>`;
+					renderState({
+						icon: failCount > 0 ? "alert" : "check",
+						title: "Отправка завершена",
+						text: `Успешно: ${successCount} · Ошибок: ${failCount}`
+					});
 				};
 
 				const deleteSkipCard = (epNum, index) => {
@@ -4865,19 +5359,7 @@
 					if (res.data.results.length > 0) {
 						renderSkipCards(res.data.results, epNum);
 					} else {
-						$("codeOutput").innerHTML = `
-						<div class="tabs">
-							<button class="tab active" type="button" data-tab="editor">Добавить</button>
-							<button class="tab" type="button" data-tab="json">JSON</button>
-						</div>
-						<div id="tabEditor" class="tab-content active"></div>
-						<div id="tabJson" class="tab-content">
-							<pre>${syntaxHighlight(res.data || res.error)}</pre>
-						</div>
-					`;
-						const editorTab = $("tabEditor");
-						if (editorTab) editorTab.appendChild(renderSkipEditor(epNum));
-						initSkipEditor();
+						renderMissingEpisode(epNum, res.data || res.error);
 					}
 
 					showToast("Карточка удалена", "success");
@@ -4959,12 +5441,19 @@
 						const malId = searchItem.dataset.malId;
 						const dur = parseInt(searchItem.dataset.duration || "0", 10) || 0;
 						const eps = parseInt(searchItem.dataset.episodes || "0", 10) || 0;
+						searchGeneration++;
+						AppState.animeTitle = searchItem.dataset.title || "";
+						clearLog();
 						if (malId) $("malId").value = malId;
+						AppState.jikanDuration = 1440;
+						AppState.realEpisodeDuration = 1440;
 						if (dur > 0) {
 							AppState.jikanDuration = dur;
 							AppState.realEpisodeDuration = dur;
 						}
-						if (eps) $("seasonEnd").value = eps;
+						$("epNum").value = 1;
+						$("seasonStart").value = 1;
+						$("seasonEnd").value = eps || 28;
 						$("searchResults").classList.remove("active");
 						return;
 					}
@@ -4980,7 +5469,7 @@
 							.forEach((b) => b.classList.remove("active"));
 						badge.classList.add("active");
 
-						$("codeLabel").innerText = `Эпизод ${ep}`;
+						$("codeLabel").textContent = `Серия ${ep}`;
 						const epInput = $("epNum");
 						if (epInput) epInput.value = ep;
 						AppState.currentEp = ep;
@@ -4991,19 +5480,11 @@
 						if (res.data && res.data.results && res.data.results.length > 0) {
 							renderSkipCards(res.data.results, ep);
 						} else {
-							$("codeOutput").innerHTML = `
-								<div class="tabs">
-									<button class="tab active" type="button" data-tab="editor">Добавить</button>
-									<button class="tab" type="button" data-tab="json">JSON</button>
-								</div>
-								<div id="tabEditor" class="tab-content active"></div>
-								<div id="tabJson" class="tab-content">
-									<pre>${syntaxHighlight(res.data || res.error)}</pre>
-								</div>
-							`;
-							const editorTab = $("tabEditor");
-							if (editorTab) editorTab.appendChild(renderSkipEditor(ep));
-							initSkipEditor();
+							renderMissingEpisode(
+								ep,
+								res.data || { message: res.error?.message },
+								res.error?.message
+							);
 						}
 						return;
 					}
@@ -5023,6 +5504,17 @@
 
 				$("searchTerm").addEventListener("keypress", (e) => {
 					if (e.key === "Enter") searchJikan();
+				});
+				$("searchTerm").addEventListener("input", () => {
+					searchGeneration++;
+					setBusy(document.querySelector('[data-action="search-jikan"]'), false);
+					$("searchResults").classList.remove("active");
+				});
+				$("malId").addEventListener("input", () => {
+					AppState.animeTitle = "";
+					AppState.jikanDuration = 1440;
+					AppState.realEpisodeDuration = 1440;
+					clearLog();
 				});
 
 				(function initBottomSheet() {

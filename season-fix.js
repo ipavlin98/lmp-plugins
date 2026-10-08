@@ -1,467 +1,511 @@
 (function () {
 	"use strict";
 
+	function cloneEpisode(episode) {
+		var copy = {};
+
+		Object.keys(episode).forEach(function (key) {
+			copy[key] = episode[key];
+		});
+
+		return copy;
+	}
+
+	function isInteger(value, min) {
+		return (
+			typeof value === "number" &&
+			isFinite(value) &&
+			value >= min &&
+			Math.floor(value) === value
+		);
+	}
+
 	var SEASON_FIX = {
 		id: "season_fix",
-		version: "1.5",
-		tvmaze_cache: {},
-		current_tv_id: null,
+		version: "4.0",
 
-		init: function () {
+		cache: {},
+		pending: {},
+		currentTvId: null,
+		hooked: false,
+
+		splitExistingSeasons: function (episodes) {
+			var seasons = {};
+
+			for (var i = 0; i < episodes.length; i++) {
+				var episode = episodes[i];
+
+				if (!episode || !isInteger(episode.season_number, 0)) {
+					return null;
+				}
+
+				var season = episode.season_number;
+
+				if (!seasons[season]) {
+					seasons[season] = [];
+				}
+
+				seasons[season].push(cloneEpisode(episode));
+			}
+
+			Object.keys(seasons).forEach(function (season) {
+				seasons[season].sort(function (a, b) {
+					return (a.episode_number || 0) - (b.episode_number || 0);
+				});
+			});
+
+			return seasons;
+		},
+
+		buildSeasonMap: function (videos) {
+			if (!Array.isArray(videos)) {
+				return null;
+			}
+
+			var seasons = {};
+
+			for (var i = 0; i < videos.length; i++) {
+				var video = videos[i];
+
+				if (!video) {
+					continue;
+				}
+
+				var season = Number(video.season);
+
+				if (season === 0) {
+					continue;
+				}
+
+				var episode = Number(
+					video.episode == null ? video.number : video.episode
+				);
+
+				if (!isInteger(season, 1) || !isInteger(episode, 1)) {
+					return null;
+				}
+
+				if (!seasons[season]) {
+					seasons[season] = {};
+				}
+
+				seasons[season][episode] = true;
+			}
+
+			var seasonNumbers = Object.keys(seasons)
+				.map(Number)
+				.sort(function (a, b) {
+					return a - b;
+				});
+
+			if (!seasonNumbers.length) {
+				return null;
+			}
+
+			var map = {};
+
+			for (var s = 0; s < seasonNumbers.length; s++) {
+				var seasonNumber = seasonNumbers[s];
+
+				if (seasonNumber !== s + 1) {
+					return null;
+				}
+
+				var episodeNumbers = Object.keys(seasons[seasonNumber])
+					.map(Number)
+					.sort(function (a, b) {
+						return a - b;
+					});
+
+				for (var e = 0; e < episodeNumbers.length; e++) {
+					if (episodeNumbers[e] !== e + 1) {
+						return null;
+					}
+				}
+
+				map[seasonNumber] = episodeNumbers.length;
+			}
+
+			return map;
+		},
+
+		splitByMap: function (episodes, map) {
+			var sorted = episodes.slice().sort(function (a, b) {
+				return (a.episode_number || 0) - (b.episode_number || 0);
+			});
+
+			var total = Object.keys(map).reduce(function (sum, season) {
+				return sum + map[season];
+			}, 0);
+
+			if (sorted.length > total) {
+				return null;
+			}
+
+			var result = {};
+			var season = 1;
+			var number = 0;
+
+			for (var i = 0; i < sorted.length; i++) {
+				var episode = sorted[i];
+
+				if (
+					!episode ||
+					episode.season_number !== 1 ||
+					episode.episode_number !== i + 1
+				) {
+					return null;
+				}
+
+				if (number === map[season]) {
+					season++;
+					number = 0;
+				}
+
+				if (!map[season]) {
+					return null;
+				}
+
+				var copy = cloneEpisode(episode);
+
+				copy.season_number = season;
+				copy.episode_number = ++number;
+
+				if (!result[season]) {
+					result[season] = [];
+				}
+
+				result[season].push(copy);
+			}
+
+			return result;
+		},
+
+		request: function (url, method, callback) {
+			var done = false;
+			var network;
+			var timer;
+
+			function finish(data, error) {
+				if (done) {
+					return;
+				}
+
+				done = true;
+
+				clearTimeout(timer);
+
+				if (network) {
+					network.clear();
+				}
+
+				callback(data, error);
+			}
+
+			timer = setTimeout(function () {
+				finish(null, true);
+			}, 8500);
+
+			try {
+				network = new Lampa.Reguest();
+				network.timeout(8000);
+
+				network[method](
+					url,
+					function (data) {
+						if (typeof data === "string") {
+							try {
+								data = JSON.parse(data);
+							} catch (e) {
+								finish(null, true);
+								return;
+							}
+						}
+
+						finish(data, !data);
+					},
+					function () {
+						finish(null, true);
+					}
+				);
+			} catch (e) {
+				finish(null, true);
+			}
+		},
+
+		loadSeasonMap: function (tvId, callback) {
 			var _this = this;
-			var attempts = 0;
-			var maxAttempts = 100;
+			var cached = this.cache[tvId];
 
-			var waitForLampa = function () {
-				attempts++;
+			var ttl = cached && cached.map
+				? 21600000
+				: 60000;
 
-				if (typeof Lampa === "undefined") {
-					if (attempts < maxAttempts) {
-						setTimeout(waitForLampa, 100);
-					}
-					return;
+			if (cached && Date.now() - cached.time < ttl) {
+				if (callback) {
+					callback(cached);
 				}
 
-				if (!Lampa.Utils || !Lampa.Utils.splitEpisodesIntoSeasons) {
-					if (attempts < maxAttempts) {
-						setTimeout(waitForLampa, 100);
-					}
-					return;
+				return;
+			}
+
+			if (this.pending[tvId]) {
+				if (callback) {
+					this.pending[tvId].push(callback);
 				}
 
-				_this.hook();
-			};
+				return;
+			}
 
-			if (typeof Lampa !== "undefined" && Lampa.Listener) {
-				Lampa.Listener.follow("app", function (e) {
-					if (e.type === "ready") {
-						_this.hook();
-					}
+			this.pending[tvId] = callback
+				? [callback]
+				: [];
+
+			function finish(map) {
+				var entry = {
+					time: Date.now(),
+					map: map || null
+				};
+
+				var waiting = _this.pending[tvId] || [];
+
+				_this.cache[tvId] = entry;
+				delete _this.pending[tvId];
+
+				waiting.forEach(function (ready) {
+					try {
+						ready(entry);
+					} catch (e) {}
 				});
 			}
 
-			waitForLampa();
+			if (
+				!Lampa.TMDB ||
+				!Lampa.TMDB.api ||
+				!Lampa.TMDB.key
+			) {
+				finish(null);
+				return;
+			}
+
+			var externalIdsUrl = Lampa.TMDB.api(
+				"tv/" +
+					tvId +
+					"/external_ids?api_key=" +
+					encodeURIComponent(Lampa.TMDB.key())
+			);
+
+			this.request(
+				externalIdsUrl,
+				"silent",
+				function (ids, error) {
+					if (
+						error ||
+						!ids ||
+						!/^tt\d+$/.test(ids.imdb_id || "")
+					) {
+						finish(null);
+						return;
+					}
+
+					var imdbId = ids.imdb_id;
+
+					var cinemetaUrl =
+						"https://v3-cinemeta.strem.io/meta/series/" +
+						imdbId +
+						".json";
+
+					_this.request(
+						cinemetaUrl,
+						"native",
+						function (data, cinemetaError) {
+							var meta = data && data.meta;
+
+							if (
+								cinemetaError ||
+								!meta ||
+								(meta.imdb_id || meta.id) !== imdbId
+							) {
+								finish(null);
+								return;
+							}
+
+							finish(
+								_this.buildSeasonMap(meta.videos)
+							);
+						}
+					);
+				}
+			);
+		},
+
+		hookRequest: function (params) {
+			if (
+				!params ||
+				params.season_fix_wrapped ||
+				typeof params.complite !== "function"
+			) {
+				return;
+			}
+
+			var match = String(params.url || "").match(
+				/\/tv\/(\d+)\/season\/(\d+)(?:\?|$)/
+			);
+
+			if (!match) {
+				return;
+			}
+
+			params.season_fix_wrapped = true;
+
+			var _this = this;
+			var tvId = match[1];
+			var requestedSeason = Number(match[2]);
+			var complete = params.complite;
+
+			if (requestedSeason === 1) {
+				this.loadSeasonMap(tvId);
+			}
+
+			params.complite = function (data) {
+				var context = this;
+				var args = arguments;
+
+				if (
+					!data ||
+					!Array.isArray(data.episodes)
+				) {
+					return complete.apply(context, args);
+				}
+
+				function deliver() {
+					var previousTvId = _this.currentTvId;
+
+					_this.currentTvId = tvId;
+
+					try {
+						return complete.apply(context, args);
+					} finally {
+						_this.currentTvId = previousTvId;
+					}
+				}
+
+				if (requestedSeason === 1) {
+					_this.loadSeasonMap(
+						tvId,
+						deliver
+					);
+
+					return;
+				}
+
+				return deliver();
+			};
 		},
 
 		hook: function () {
-			var _this = this;
-
 			if (this.hooked) {
-				return;
+				return true;
 			}
 
 			if (
 				typeof Lampa === "undefined" ||
 				!Lampa.Utils ||
-				!Lampa.Utils.splitEpisodesIntoSeasons
+				typeof Lampa.Utils.splitEpisodesIntoSeasons !== "function" ||
+				!Lampa.Listener ||
+				!Lampa.Reguest
 			) {
-				return;
+				return false;
 			}
+
+			var _this = this;
+			var originalSplit =
+				Lampa.Utils.splitEpisodesIntoSeasons;
+
+			Lampa.Utils.splitEpisodesIntoSeasons =
+				function (episodes) {
+					if (
+						!Array.isArray(episodes) ||
+						!episodes.length
+					) {
+						return originalSplit.apply(
+							this,
+							arguments
+						);
+					}
+
+					var seasons =
+						_this.splitExistingSeasons(
+							episodes
+						);
+
+					if (!seasons) {
+						return originalSplit.apply(
+							this,
+							arguments
+						);
+					}
+
+					var first = episodes[0] || {};
+
+					var tvId =
+						first.show_id ||
+						first.series_id ||
+						_this.currentTvId;
+
+					var cached =
+						tvId &&
+						_this.cache[tvId];
+
+					var mapped =
+						cached &&
+						cached.map &&
+						_this.splitByMap(
+							episodes,
+							cached.map
+						);
+
+					return mapped || seasons;
+				};
+
+			Lampa.Listener.follow(
+				"request_before",
+				function (event) {
+					if (event) {
+						_this.hookRequest(
+							event.params
+						);
+					}
+				}
+			);
 
 			this.hooked = true;
 
-			window.SEASON_FIX = _this;
-
-			this.overrideSplitFunction();
-			this.hookTMDB();
-			this.hookAjax();
+			return true;
 		},
 
-		overrideSplitFunction: function () {
-			var _this = this;
-			var originalSplit = Lampa.Utils.splitEpisodesIntoSeasons;
-
-			Lampa.Utils.splitEpisodesIntoSeasons = function (episodes, gap) {
-				if (!Array.isArray(episodes) || episodes.length === 0) {
-					return {};
-				}
-
-				var tvId =
-					(episodes[0] && (episodes[0].show_id || episodes[0].series_id)) ||
-					_this.current_tv_id;
-				var seasonMap = tvId ? _this.tvmaze_cache[tvId] : null;
-
-				if (
-					seasonMap &&
-					typeof seasonMap === "object" &&
-					Object.keys(seasonMap).length > 0
-				) {
-					return _this.splitByTvmaze(episodes, seasonMap);
-				}
-
-				return originalSplit.call(this, episodes, gap);
-			};
-		},
-
-		splitByTvmaze: function (episodes, seasonMap) {
-			var sorted = episodes.slice().sort(function (a, b) {
-				return (a.episode_number || 0) - (b.episode_number || 0);
-			});
-
-			var seasons = {};
-			var currentSeason = 1;
-			var episodeCounter = 0;
-			var seasonLimit = seasonMap[currentSeason] || 9999;
-
-			for (var i = 0; i < sorted.length; i++) {
-				var ep = sorted[i];
-				episodeCounter++;
-
-				if (episodeCounter > seasonLimit) {
-					currentSeason++;
-					episodeCounter = 1;
-					seasonLimit = seasonMap[currentSeason] || 9999;
-				}
-
-				if (!seasons[currentSeason]) {
-					seasons[currentSeason] = [];
-				}
-
-				var newEp;
-				try {
-					newEp = JSON.parse(JSON.stringify(ep));
-				} catch (e) {
-					newEp = {};
-					for (var k in ep) {
-						if (ep.hasOwnProperty(k)) newEp[k] = ep[k];
-					}
-				}
-
-				newEp.season_number = currentSeason;
-				newEp.episode_number = episodeCounter;
-				newEp.id = 900000 + currentSeason * 1000 + episodeCounter;
-				seasons[currentSeason].push(newEp);
-			}
-
-			return seasons;
-		},
-
-		hookTMDB: function () {
+		init: function () {
 			var _this = this;
 
-			if (typeof Lampa === "undefined" || !Lampa.TMDB) {
-				return;
+			function waitForLampa() {
+				if (!_this.hook()) {
+					setTimeout(
+						waitForLampa,
+						500
+					);
+				}
 			}
 
-			if (Lampa.TMDB.get) {
-				var originalGet = Lampa.TMDB.get;
-
-				Lampa.TMDB.get = function (method) {
-					var tvMatch = method ? method.match(/tv\/(\d+)/) : null;
-					if (tvMatch) {
-						var tvId = tvMatch[1];
-						_this.current_tv_id = tvId;
-
-						if (!_this.tvmaze_cache[tvId]) {
-							_this.fetchTvmaze(tvId);
-						}
-					}
-					return originalGet.apply(this, arguments);
-				};
-			}
-		},
-
-		hookAjax: function () {
-			var _this = this;
-
-			if (typeof $ === "undefined" || !$.ajax) {
-				return;
-			}
-
-			var originalAjax = $.ajax;
-
-			$.ajax = function (url, options) {
-				var settings = typeof url === "object" ? url : options || {};
-				var reqUrl = typeof url === "string" ? url : settings.url || "";
-
-				var tvMatch = reqUrl.match(/\/tv\/(\d+)/);
-				if (tvMatch) {
-					var tvId = tvMatch[1];
-					_this.current_tv_id = tvId;
-
-					var apiKeyMatch = reqUrl.match(/api_key=([^&]+)/);
-					var apiKey = apiKeyMatch ? apiKeyMatch[1] : null;
-
-					if (!_this.tvmaze_cache[tvId] && apiKey) {
-						_this.fetchTvmaze(tvId, apiKey);
-					}
-				}
-
-				return originalAjax.apply(this, arguments);
-			};
-		},
-
-		fetchTvmaze: function (tvId, apiKey) {
-			var _this = this;
-
-			if (this.tvmaze_cache[tvId]) {
-				return;
-			}
-
-			this.tvmaze_cache[tvId] = "loading";
-
-			if (
-				!apiKey &&
-				typeof Lampa !== "undefined" &&
-				Lampa.TMDB &&
-				Lampa.TMDB.key
-			) {
-				apiKey = Lampa.TMDB.key();
-			}
-
-			if (!apiKey) {
-				delete this.tvmaze_cache[tvId];
-				return;
-			}
-
-			var externalUrl;
-			if (typeof Lampa !== "undefined" && Lampa.TMDB && Lampa.TMDB.api) {
-				externalUrl = Lampa.TMDB.api(
-					"tv/" + tvId + "/external_ids?api_key=" + apiKey
-				);
-			} else {
-				externalUrl =
-					"https://api.themoviedb.org/3/tv/" +
-					tvId +
-					"/external_ids?api_key=" +
-					apiKey;
-			}
-
-			this.makeRequest(externalUrl, function (ids, status, error) {
-				if (!ids) {
-					delete _this.tvmaze_cache[tvId];
-					return;
-				}
-
-				var lookupId = null;
-				var lookupType = null;
-
-				if (ids.imdb_id) {
-					lookupId = ids.imdb_id;
-					lookupType = "imdb";
-				} else if (ids.tvdb_id) {
-					lookupId = ids.tvdb_id;
-					lookupType = "thetvdb";
-				}
-
-				if (!lookupId) {
-					delete _this.tvmaze_cache[tvId];
-					return;
-				}
-
-				var lookupUrl =
-					"https://api.tvmaze.com/lookup/shows?" + lookupType + "=" + lookupId;
-
-				_this.makeRequest(lookupUrl, function (showData, status2, error2) {
-					if (!showData || !showData.id) {
-						delete _this.tvmaze_cache[tvId];
-						return;
-					}
-
-					var episodesUrl =
-						"https://api.tvmaze.com/shows/" + showData.id + "/episodes";
-
-					_this.makeRequest(episodesUrl, function (episodes, status3, error3) {
-						if (!episodes || !episodes.length) {
-							delete _this.tvmaze_cache[tvId];
-							return;
-						}
-
-						var map = {};
-						for (var i = 0; i < episodes.length; i++) {
-							var ep = episodes[i];
-							var s = ep.season;
-							if (!map[s]) map[s] = 0;
-							map[s]++;
-						}
-
-						if (Object.keys(map).length > 0) {
-							_this.tvmaze_cache[tvId] = map;
-							window.dispatchEvent(
-								new CustomEvent("tvmaze_loaded", { detail: { id: tvId } })
-							);
-						} else {
-							delete _this.tvmaze_cache[tvId];
-						}
-					});
-				});
-			});
-		},
-
-		makeRequest: function (url, callback) {
-			var _this = this;
-
-			var useLampaReguest = function () {
-				if (typeof Lampa === "undefined" || !Lampa.Reguest) {
-					useFetch();
-					return;
-				}
-
-				try {
-					var network = new Lampa.Reguest();
-					network.timeout(15000);
-
-					var isTmdbUrl =
-						url.indexOf("themoviedb.org") !== -1 ||
-						url.indexOf("apitmdb.") !== -1;
-					var method = isTmdbUrl ? "silent" : "native";
-
-					var successCb = function (data) {
-						callback(data, 200, null);
-					};
-
-					var errorCb = function (e, x) {
-						useFetch();
-					};
-
-					if (method === "native") {
-						network.native(url, successCb, errorCb);
-					} else {
-						network.silent(url, successCb, errorCb);
-					}
-				} catch (e) {
-					useFetch();
-				}
-			};
-
-			var useXHR = function () {
-				try {
-					var xhr = new XMLHttpRequest();
-					xhr.open("GET", url, true);
-					xhr.timeout = 15000;
-
-					xhr.onload = function () {
-						if (xhr.status >= 200 && xhr.status < 300) {
-							try {
-								var data = JSON.parse(xhr.responseText);
-								callback(data, xhr.status, null);
-							} catch (e) {
-								callback(null, xhr.status, "parse error");
-							}
-						} else {
-							callback(null, xhr.status, "status " + xhr.status);
-						}
-					};
-
-					xhr.onerror = function () {
-						callback(null, 0, "network error");
-					};
-
-					xhr.ontimeout = function () {
-						callback(null, 0, "timeout");
-					};
-
-					xhr.send();
-				} catch (e) {
-					callback(null, 0, e.message);
-				}
-			};
-
-			var useJQuery = function () {
-				if (typeof $ === "undefined" || !$.ajax) {
-					useXHR();
-					return;
-				}
-
-				$.ajax({
-					url: url,
-					type: "GET",
-					dataType: "json",
-					timeout: 15000,
-					success: function (data, textStatus, jqXHR) {
-						callback(data, jqXHR ? jqXHR.status : 200, null);
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						useXHR();
-					}
-				});
-			};
-
-			var useFetch = function () {
-				if (typeof fetch === "undefined") {
-					useJQuery();
-					return;
-				}
-
-				var controller;
-				var timeoutId;
-
-				try {
-					if (typeof AbortController !== "undefined") {
-						controller = new AbortController();
-						timeoutId = setTimeout(function () {
-							controller.abort();
-						}, 15000);
-					}
-				} catch (e) {}
-
-				fetch(url, controller ? { signal: controller.signal } : {})
-					.then(function (response) {
-						if (timeoutId) clearTimeout(timeoutId);
-						if (!response.ok) {
-							throw new Error("HTTP " + response.status);
-						}
-						return response.json();
-					})
-					.then(function (data) {
-						callback(data, 200, null);
-					})
-					.catch(function (error) {
-						if (timeoutId) clearTimeout(timeoutId);
-						useJQuery();
-					});
-			};
-
-			useLampaReguest();
+			waitForLampa();
 		}
 	};
 
-	function start() {
-		if (window.ANIME_FIX_LOADED) {
-			return;
-		}
-		window.ANIME_FIX_LOADED = true;
-		SEASON_FIX.init();
+	if (window.SEASON_FIX) {
+		return;
 	}
 
-	if (
-		document.readyState === "complete" ||
-		document.readyState === "interactive"
-	) {
-		setTimeout(start, 0);
-	} else {
-		document.addEventListener("DOMContentLoaded", start);
-	}
+	window.SEASON_FIX_LOADED = true;
+	window.SEASON_FIX = SEASON_FIX;
 
-	if (typeof Lampa !== "undefined") {
-		if (window.appready) {
-			start();
-		} else if (Lampa.Listener) {
-			Lampa.Listener.follow("app", function (e) {
-				if (e.type === "ready") {
-					start();
-				}
-			});
-		}
-	} else {
-		var checkInterval = setInterval(function () {
-			if (typeof Lampa !== "undefined") {
-				clearInterval(checkInterval);
-				if (window.appready) {
-					start();
-				} else if (Lampa.Listener) {
-					Lampa.Listener.follow("app", function (e) {
-						if (e.type === "ready") {
-							start();
-						}
-					});
-				}
-			}
-		}, 100);
-
-		setTimeout(function () {
-			clearInterval(checkInterval);
-			start();
-		}, 5000);
-	}
+	SEASON_FIX.init();
 })();

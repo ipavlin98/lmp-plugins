@@ -8,28 +8,23 @@
 		document.head.appendChild(style);
 	}
 
-	function disableMic() {
-		var mic = document.querySelector(".simple-keyboard-mic");
+	function handleSearch() {
+		var keyboard = document.querySelector(".simple-keyboard");
+		if (!keyboard) return;
+
+		var mic = keyboard.querySelector(".simple-keyboard-mic");
+		var input = keyboard.querySelector(".simple-keyboard-input");
+		var updateCollection = mic && mic.classList.contains("selector");
+
 		if (mic) {
 			mic.classList.remove("selector");
 			mic.removeAttribute("tabindex");
 		}
-	}
 
-	function focusInput() {
-		var input = document.querySelector(
-			"#orsay-keyboard.simple-keyboard-input, .simple-keyboard-input"
-		);
-		if (input && document.activeElement !== input) {
-			input.focus();
+		if (input && (updateCollection || document.activeElement !== input)) {
+			if (updateCollection) Lampa.Controller.collectionSet(keyboard);
+			Lampa.Controller.collectionFocus(input, keyboard);
 		}
-	}
-
-	function handleSearch() {
-		setTimeout(function () {
-			focusInput();
-			disableMic();
-		}, 100);
 	}
 
 	function start() {
@@ -41,13 +36,22 @@
 		});
 	}
 
-	if (window.appready) {
-		start();
-	} else if (typeof Lampa !== "undefined" && Lampa.Listener) {
-		Lampa.Listener.follow("app", function (e) {
-			if (e.type === "ready") start();
-		});
-	} else {
-		setTimeout(start, 500);
+	function onReady(e) {
+		if (e.type === "ready") {
+			Lampa.Listener.remove("app", onReady);
+			start();
+		}
 	}
+
+	function init() {
+		if (typeof Lampa === "undefined" || !Lampa.Listener) {
+			setTimeout(init, 500);
+		} else if (window.appready) {
+			start();
+		} else {
+			Lampa.Listener.follow("app", onReady);
+		}
+	}
+
+	init();
 })();
